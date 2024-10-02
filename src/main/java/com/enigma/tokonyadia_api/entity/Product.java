@@ -19,6 +19,7 @@ public class Product {
     private Long price;
 
     @ManyToOne
+    @JoinColumn
     private Store store;
 
 }
