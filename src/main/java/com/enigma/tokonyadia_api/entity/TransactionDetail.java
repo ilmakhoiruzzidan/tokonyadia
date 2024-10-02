@@ -20,7 +20,7 @@ public class TransactionDetail {
     @JoinColumn
     private Product product;
 
-    @Column(name = "price", nullable = false, columnDefinition = "bingint check (price > 0)")
+    @Column(name = "price", nullable = false, columnDefinition = "bigint check (price > 0)")
     private Long price;
 
     @Column(name = "qty", nullable = false, columnDefinition = "int check (qty > 0)")

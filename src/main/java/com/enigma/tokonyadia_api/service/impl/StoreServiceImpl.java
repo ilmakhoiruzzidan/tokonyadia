@@ -22,7 +22,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Store getStoreById(String id) {
         Optional<Store> byId = storeRepository.findById(id);
-        if(byId.isEmpty()){
+        if (byId.isEmpty()) {
             throw new RuntimeException("Data store tidak ditemukan");
         }
         return byId.get();
@@ -36,7 +36,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Store updateStore(String id, Store store) {
         Optional<Store> selectedStore = storeRepository.findById(id);
-        if(selectedStore.isPresent()){
+        if (selectedStore.isPresent()) {
             Store newStore = selectedStore.get();
             newStore.setNoSiup(store.getNoSiup());
             newStore.setAddress(store.getAddress());
@@ -47,8 +47,14 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void deleteStore(String id) {
-
+    public String deleteStore(String id) {
+        Store storeById = getStoreById(id);
+        if (storeById != null) {
+            storeRepository.delete(storeById);
+            return "Data store berhasil dihapus";
+        } else {
+            throw new RuntimeException("Data store tidak ditemukan");
+        }
     }
 
 

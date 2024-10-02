@@ -7,7 +7,6 @@ import lombok.Data;
 @Entity
 @Table(name = "m_product")
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -19,7 +18,7 @@ public class Product {
     private Long price;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "store_id")
     private Store store;
 
 }

@@ -23,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getProductById(String id) {
         Optional<Product> byId = productRepository.findById(id);
-        if (byId.isEmpty()){
+        if (byId.isEmpty()) {
             throw new RuntimeException("Data produk tidak ditemukan");
         }
         return byId.get();
@@ -35,24 +35,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(String id) {
+    public String deleteProduct(String id) {
         Product productById = getProductById(id);
-        if (productById != null){
+        if (productById != null) {
             productRepository.delete(productById);
+            return "Product berhasil dihapus";
+        } else {
+            throw new RuntimeException("Data produk tidak ada");
         }
-        throw new RuntimeException("Data produk tidak ada");
     }
 
     @Override
     public Product updateProduct(String id, Product product) {
         Optional<Product> selectedProduct = productRepository.findById(id);
-        if (selectedProduct.isPresent()){
+        if (selectedProduct.isPresent()) {
             Product newProduct = selectedProduct.get();
             newProduct.setName(product.getName());
             newProduct.setPrice(product.getPrice());
             newProduct.setStore(product.getStore());
             return productRepository.save(newProduct);
         }
-        throw new RuntimeException("Update data gagal") ;
+        throw new RuntimeException("Update data gagal");
     }
 }

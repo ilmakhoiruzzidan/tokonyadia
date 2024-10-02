@@ -15,7 +15,7 @@ public class ProductController {
     public final ProductService productService;
 
     @PostMapping
-    public Product saveProduct(Product product) {
+    public Product saveProduct(@RequestBody Product product) {
         return productService.createProduct(product);
     }
 
@@ -35,7 +35,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable String id) {
-        productService.deleteProduct(id);
+    public String  deleteProduct(@PathVariable String id) {
+        return productService.deleteProduct(id);
     }
 }

@@ -11,6 +11,9 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "name", length = 50)
+    private String name;
+
     @Column(name = "no_siup", nullable = false, unique = true, length = 20)
     private String noSiup;
 

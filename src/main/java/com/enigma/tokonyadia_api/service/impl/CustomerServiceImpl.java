@@ -35,12 +35,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(String id) {
+    public String deleteCustomer(String id) {
         Customer customerById = getCustomerById(id);
         if (customerById != null) {
             customerRepository.deleteById(id);
+            return "Pelanggan berhasil terhapus";
+        } else {
+            throw new RuntimeException("Data pelanggan tidak ada");
         }
-        throw new RuntimeException("Data pelanggan tidak ada");
     }
 
     @Override

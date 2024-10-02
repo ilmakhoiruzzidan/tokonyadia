@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -18,9 +17,9 @@ public class Transaction {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime transDate;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn
-    private List<Customer> customer;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @PrePersist
     protected void PrePersist() {

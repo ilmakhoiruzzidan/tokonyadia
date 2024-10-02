@@ -13,14 +13,14 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @OneToMany
-    @JoinColumn
-    private List<Product> product;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    @OneToMany
-    @JoinColumn
-    private List<Store> store;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "store_id")
+    private Store store;
 
-    @Column(name = "stock", columnDefinition = "(int check (stock > 0))")
+    @Column(name = "stock", columnDefinition = "int check (stock > 0)")
     private Integer stock;
 }
