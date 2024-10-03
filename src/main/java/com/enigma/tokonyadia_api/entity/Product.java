@@ -3,6 +3,7 @@ package com.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +24,7 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne()
     @JoinColumn(name = "store_id")
     private Store store;
 

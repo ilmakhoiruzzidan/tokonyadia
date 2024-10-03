@@ -1,12 +1,15 @@
 package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.entity.Customer;
+import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.service.CustomerService;
+import com.enigma.tokonyadia_api.utils.ResponseUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping(path = Constant.PATH_CUSTOMER)
 @RestController
@@ -16,28 +19,37 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerService.saveCustomer(customer);
-    }
-
-    @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable String id) {
-        return customerService.getCustomerById(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public String deleteCustomerById(@PathVariable String id) {
-        return customerService.deleteCustomer(id);
+    public ResponseEntity<?> saveCustomer(@RequestBody CustomerRequest request) {
+        CustomerResponse customerResponse = customerService.createCustomer(request);
+        return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_CUSTOMER, customerResponse);
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerService.getAllCustomers();
+    public ResponseEntity<?> getAllCustomers(
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "sort", required = false) String sort
+    ) {
+        Page<CustomerResponse> allCustomers = customerService.getAllCustomers(page, size, sort);
+        return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_CUSTOMER, allCustomers);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCustomerById(@PathVariable String id) {
+        CustomerResponse customerResponse = customerService.getCustomerById(id);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_CUSTOMER_BY_ID, customerResponse);
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
-        return customerService.updateCustomer(id, customer);
+    public ResponseEntity<?> updateCustomer(@PathVariable String id, @RequestBody CustomerRequest request) {
+        CustomerResponse customerResponse = customerService.updateCustomer(id, request);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_CUSTOMER, customerResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomerById(@PathVariable String id) {
+        customerService.deleteCustomer(id);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_CUSTOMER, null);
     }
 
 }

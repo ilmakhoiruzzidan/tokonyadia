@@ -1,13 +1,13 @@
 package com.enigma.tokonyadia_api.service;
 
-import com.enigma.tokonyadia_api.entity.Product;
-
-import java.util.List;
+import com.enigma.tokonyadia_api.dto.request.ProductRequest;
+import com.enigma.tokonyadia_api.dto.response.ProductResponse;
+import org.springframework.data.domain.Page;
 
 public interface ProductService {
-    Product createProduct(Product product);
-    Product getProductById(String id);
-    List<Product> getAllProducts();
-    String deleteProduct(String id);
-    Product updateProduct(String id, Product product);
+    ProductResponse createProduct(ProductRequest request);
+    ProductResponse getProductById(String id);
+    Page<ProductResponse> getAllProducts(Integer page, Integer size, String sort);
+    void deleteProduct(String id);
+    ProductResponse updateProduct(String id, ProductRequest request);
 }

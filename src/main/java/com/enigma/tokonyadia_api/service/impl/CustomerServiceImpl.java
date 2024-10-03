@@ -1,13 +1,25 @@
 package com.enigma.tokonyadia_api.service.impl;
 
+import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
+import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
+import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.CustomerRepository;
 import com.enigma.tokonyadia_api.service.CustomerService;
+import com.enigma.tokonyadia_api.utils.SortUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -16,45 +28,71 @@ public class CustomerServiceImpl implements CustomerService {
     public final CustomerRepository customerRepository;
 
     @Override
-    public Customer saveCustomer(Customer customer) {
-        return customerRepository.save(customer);
+    public CustomerResponse createCustomer(CustomerRequest request) {
+        Customer customer = Customer.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .build();
+        customerRepository.saveAndFlush(customer);
+        return toCustomerResponse(customer);
     }
 
     @Override
-    public Customer getCustomerById(String id) {
-        Optional<Customer> byId = customerRepository.findById(id);
-        if (byId.isEmpty()) {
-            throw new RuntimeException("Data pelanggan tidak ditemukan");
-        }
-        return byId.get();
+    public CustomerResponse getCustomerById(String id) {
+        Customer customer = getOne(id);
+        return toCustomerResponse(customer);
     }
 
     @Override
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public Page<CustomerResponse> getAllCustomers(Integer page, Integer size, String sort) {
+        if (page <= 0) page = 1;
+        Sort sortBy = SortUtil.parseSort(sort);
+        Pageable pageable = PageRequest.of((page - 1), size, sortBy);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        return customerPage.map(new Function<Customer, CustomerResponse>() {
+            @Override
+            public CustomerResponse apply(Customer customer) {
+                return toCustomerResponse(customer);
+            }
+        });
+
     }
 
     @Override
-    public String deleteCustomer(String id) {
-        Customer customerById = getCustomerById(id);
-        if (customerById != null) {
-            customerRepository.deleteById(id);
-            return "Pelanggan berhasil terhapus";
-        } else {
-            throw new RuntimeException("Data pelanggan tidak ada");
-        }
-    }
-
-    @Override
-    public Customer updateCustomer(String id, Customer customer) {
-        Optional<Customer> selectedCustomer = customerRepository.findById(id);
-        if(selectedCustomer.isPresent()) {
-            Customer newCustomer = selectedCustomer.get();
-            newCustomer.setName(customer.getName());
-            newCustomer.setEmail(customer.getEmail());
-            newCustomer.setPhoneNumber(customer.getPhoneNumber());
-            return customerRepository.save(newCustomer);
+    public CustomerResponse updateCustomer(String id, CustomerRequest request) {
+        Customer newCustomer = getOne(id);
+        if (newCustomer != null) {
+            newCustomer.setName(request.getName());
+            newCustomer.setEmail(request.getEmail());
+            newCustomer.setPhoneNumber(request.getPhoneNumber());
+            customerRepository.save(newCustomer);
+            return toCustomerResponse(newCustomer);
         }
         throw new RuntimeException("Update data gagal");
+    }
+
+    @Override
+    public void deleteCustomer(String id) {
+        Customer customer = getOne(id);
+        if (customer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data pelanggan tidak ditemukan");
+        } else {
+            customerRepository.deleteById(id);
+        }
+    }
+
+    public Customer getOne(String id) {
+        Optional<Customer> byId = customerRepository.findById(id);
+        return byId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data pelanggan tidak ditemukan"));
+    }
+
+    public CustomerResponse toCustomerResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .phoneNumber(customer.getPhoneNumber())
+                .email(customer.getEmail())
+                .build();
     }
 }

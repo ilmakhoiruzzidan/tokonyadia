@@ -3,6 +3,7 @@ package com.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor
