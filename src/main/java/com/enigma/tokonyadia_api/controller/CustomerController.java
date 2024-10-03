@@ -4,7 +4,6 @@ import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.entity.Customer;
 import com.enigma.tokonyadia_api.service.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

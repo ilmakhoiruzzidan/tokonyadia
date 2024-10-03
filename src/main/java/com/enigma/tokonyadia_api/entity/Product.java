@@ -1,9 +1,12 @@
 package com.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "m_product")
 public class Product {
@@ -11,13 +14,16 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name", length = 50)
+    @Column(name = "name", nullable = false,length = 50)
     private String name;
 
-    @Column(name = "price", columnDefinition = "bigint check(price > 0)")
+    @Column(name = "price", nullable = false, columnDefinition = "bigint check(price > 0)")
     private Long price;
 
-    @ManyToOne
+    @Column(name = "description")
+    private String description;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "store_id")
     private Store store;
 

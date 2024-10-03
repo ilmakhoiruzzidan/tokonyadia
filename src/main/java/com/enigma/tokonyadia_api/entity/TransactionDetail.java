@@ -1,9 +1,12 @@
 package com.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "t_transaction_detail")
 public class TransactionDetail {

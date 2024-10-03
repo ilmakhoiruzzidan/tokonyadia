@@ -1,9 +1,12 @@
 package com.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "m_store")
 public class Store {
@@ -11,7 +14,7 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name", length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
     @Column(name = "no_siup", nullable = false, unique = true, length = 20)

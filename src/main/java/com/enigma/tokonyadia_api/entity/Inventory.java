@@ -1,11 +1,12 @@
 package com.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.util.List;
-
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "t_inventory")
 public class Inventory {
