@@ -30,14 +30,16 @@ public class CustomerController {
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "q") String query,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        PagingAndSortingRequest pagingAndSortingRequest = PagingAndSortingRequest.builder()
+        SearchCustomerRequest searchCustomerRequest = SearchCustomerRequest.builder()
                 .page(page)
                 .size(size)
+                .query(query)
                 .sortBy(sortBy)
                 .build();
-        Page<CustomerResponse> allCustomers = customerService.getAllCustomers(pagingAndSortingRequest);
+        Page<CustomerResponse> allCustomers = customerService.getAllCustomers(searchCustomerRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_CUSTOMER, allCustomers);
     }
 
@@ -59,17 +61,4 @@ public class CustomerController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_CUSTOMER, null);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> findCustomerByName(
-            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(name = "name") String name) {
-        SearchCustomerRequest searchCustomerRequest = SearchCustomerRequest.builder()
-                .page(page)
-                .size(size)
-                .name(name)
-                .build();
-        Page<CustomerResponse> customerResponse = customerService.findCustomerByName(searchCustomerRequest);
-        return ResponseUtil.buildResponsePagination(HttpStatus.OK, "Successfully retrieve customer with " + name, customerResponse);
-    }
 }

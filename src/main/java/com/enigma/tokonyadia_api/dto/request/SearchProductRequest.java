@@ -6,11 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class SearchCustomerRequest extends PagingAndSortingRequest{
+public class SearchProductRequest extends PagingAndSortingRequest {
     private String query;
+    private Long minPrice;
+    private Long maxPrice;
 }

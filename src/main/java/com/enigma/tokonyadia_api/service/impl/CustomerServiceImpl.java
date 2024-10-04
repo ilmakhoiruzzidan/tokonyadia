@@ -2,6 +2,7 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -9,12 +10,14 @@ import com.enigma.tokonyadia_api.entity.Customer;
 import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.CustomerRepository;
 import com.enigma.tokonyadia_api.service.CustomerService;
+import com.enigma.tokonyadia_api.specification.CustomerSpecification;
 import com.enigma.tokonyadia_api.utils.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -48,10 +51,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponse> getAllCustomers(PagingAndSortingRequest request) {
+    public Page<CustomerResponse> getAllCustomers(SearchCustomerRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
-        Pageable pageable = PageRequest.of(request.getPage() <= 0 ? 1 : request.getPage(), request.getSize(), sortBy);
-        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Customer> customerSpecification = CustomerSpecification.getSpecification(request);
+        Page<Customer> customerPage = customerRepository.findAll(customerSpecification, pageable);
         return customerPage.map(new Function<Customer, CustomerResponse>() {
             @Override
             public CustomerResponse apply(Customer customer) {
@@ -74,19 +78,6 @@ public class CustomerServiceImpl implements CustomerService {
         throw new RuntimeException("Update data gagal");
     }
 
-    @Override
-    public Page<CustomerResponse> findCustomerByName(SearchCustomerRequest request) {
-
-        Sort sortBy = SortUtil.parseSort(request.getSortBy());
-        Pageable pageable = PageRequest.of(request.getPage() <= 0 ? 1 : request.getPage(), request.getSize(), sortBy);
-        Page<Customer> customers = customerRepository.findByNameIsLikeIgnoreCase(request.getName() ,pageable);
-        return customers.map(new Function<Customer, CustomerResponse>() {
-            @Override
-            public CustomerResponse apply(Customer customer) {
-                return toCustomerResponse(customer);
-            }
-        });
-    }
 
     @Override
     public void deleteCustomer(String id) {
@@ -98,6 +89,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+
+    @Override
     public Customer getOne(String id) {
         Optional<Customer> byId = customerRepository.findById(id);
         return byId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data pelanggan tidak ditemukan"));

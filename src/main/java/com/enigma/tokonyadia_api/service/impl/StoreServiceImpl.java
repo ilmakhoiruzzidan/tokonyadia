@@ -7,12 +7,14 @@ import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.StoreRepository;
 import com.enigma.tokonyadia_api.service.StoreService;
+import com.enigma.tokonyadia_api.specification.StoreSpecification;
 import com.enigma.tokonyadia_api.utils.SortUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,10 +47,11 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Page<StoreResponse> getAllStores(PagingAndSortingRequest request) {
+    public Page<StoreResponse> getAllStores(SearchStoreRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
-        Page<Store> storePage = storeRepository.findAll(pageable);
+        Specification<Store> storeSpecification = StoreSpecification.getSpecification(request);
+        Page<Store> storePage = storeRepository.findAll(storeSpecification, pageable);
         return storePage.map(new Function<Store, StoreResponse>() {
             @Override
             public StoreResponse apply(Store store) {
@@ -79,6 +82,7 @@ public class StoreServiceImpl implements StoreService {
         }
     }
 
+    @Override
     public Store getOne(String id) {
         Optional<Store> byId = storeRepository.findById(id);
         return byId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Toko tidak ditemukan"));

@@ -3,6 +3,7 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Store;
@@ -36,14 +37,16 @@ public class StoreController {
     public ResponseEntity<?> getAllStores(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "q") String query,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        PagingAndSortingRequest pagingAndSortingRequest = PagingAndSortingRequest.builder()
+        SearchStoreRequest searchStoreRequest = SearchStoreRequest.builder()
                 .page(page)
                 .size(size)
+                .query(query)
                 .sortBy(sortBy)
                 .build();
-        Page<StoreResponse> allStores = storeService.getAllStores(pagingAndSortingRequest);
+        Page<StoreResponse> allStores = storeService.getAllStores(searchStoreRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_STORE, allStores);
     }
 

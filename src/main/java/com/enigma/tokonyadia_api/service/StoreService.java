@@ -14,9 +14,11 @@ public interface StoreService {
 
     StoreResponse getStoreById(String id);
 
-    void deleteStore(String id);
-
-    Page<StoreResponse> getAllStores(PagingAndSortingRequest request);
+    Page<StoreResponse> getAllStores(SearchStoreRequest request);
 
     StoreResponse updateStore(StoreRequest request, String id);
+
+    void deleteStore(String id);
+
+    Store getOne(String id);
 }

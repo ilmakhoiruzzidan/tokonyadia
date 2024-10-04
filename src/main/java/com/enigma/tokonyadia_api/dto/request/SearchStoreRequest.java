@@ -13,5 +13,4 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class SearchStoreRequest extends PagingAndSortingRequest{
     private String query;
-    private String name;
 }

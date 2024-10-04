@@ -15,11 +15,11 @@ public interface CustomerService {
 
     CustomerResponse getCustomerById(String id);
 
-    Page<CustomerResponse> getAllCustomers(PagingAndSortingRequest request);
+    Page<CustomerResponse> getAllCustomers(SearchCustomerRequest request);
+
+    CustomerResponse updateCustomer(String id, CustomerRequest request);
 
     void deleteCustomer(String id);
 
-    Page<CustomerResponse> findCustomerByName(SearchCustomerRequest request);
-
-    CustomerResponse updateCustomer(String id, CustomerRequest request);
+    Customer getOne(String id);
 }

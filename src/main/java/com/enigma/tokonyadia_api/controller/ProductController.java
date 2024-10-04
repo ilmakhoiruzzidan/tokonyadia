@@ -2,6 +2,8 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
 import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
@@ -27,9 +29,20 @@ public class ProductController {
     public ResponseEntity<?> getAllProducts(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(name = "sort", required = false) String sort
+            @RequestParam(name = "maxPrice", required = false) Long maxPrice,
+            @RequestParam(name = "minPrice", required = false) Long minPrice,
+            @RequestParam(name = "q") String query,
+            @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        Page<ProductResponse> allProducts = productService.getAllProducts(page, size, sort);
+        SearchProductRequest searchProductRequest = SearchProductRequest.builder()
+                .page(page)
+                .size(size)
+                .maxPrice(maxPrice)
+                .minPrice(minPrice)
+                .query(query)
+                .sortBy(sortBy)
+                .build();
+        Page<ProductResponse> allProducts = productService.getAllProducts(searchProductRequest);
 
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_PRODUCT, allProducts);
     }
@@ -42,7 +55,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody ProductRequest request) {
-        ProductResponse productResponse = productService.updateProduct(id, request);
+        ProductResponse productResponse = productService.updateProduct(request, id);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
     }
 
