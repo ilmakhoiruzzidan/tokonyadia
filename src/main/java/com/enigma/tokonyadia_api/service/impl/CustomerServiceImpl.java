@@ -1,6 +1,8 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -45,10 +48,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponse> getAllCustomers(Integer page, Integer size, String sort) {
-        if (page <= 0) page = 1;
-        Sort sortBy = SortUtil.parseSort(sort);
-        Pageable pageable = PageRequest.of((page - 1), size, sortBy);
+    public Page<CustomerResponse> getAllCustomers(PagingAndSortingRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage() <= 0 ? 1 : request.getPage(), request.getSize(), sortBy);
         Page<Customer> customerPage = customerRepository.findAll(pageable);
         return customerPage.map(new Function<Customer, CustomerResponse>() {
             @Override
@@ -70,6 +72,20 @@ public class CustomerServiceImpl implements CustomerService {
             return toCustomerResponse(newCustomer);
         }
         throw new RuntimeException("Update data gagal");
+    }
+
+    @Override
+    public Page<CustomerResponse> findCustomerByName(SearchCustomerRequest request) {
+
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage() <= 0 ? 1 : request.getPage(), request.getSize(), sortBy);
+        Page<Customer> customers = customerRepository.findByNameIsLikeIgnoreCase(request.getName() ,pageable);
+        return customers.map(new Function<Customer, CustomerResponse>() {
+            @Override
+            public CustomerResponse apply(Customer customer) {
+                return toCustomerResponse(customer);
+            }
+        });
     }
 
     @Override

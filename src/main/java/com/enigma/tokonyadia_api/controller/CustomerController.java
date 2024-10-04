@@ -2,6 +2,8 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.service.CustomerService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
@@ -28,9 +30,14 @@ public class CustomerController {
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(name = "sort", required = false) String sort
+            @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        Page<CustomerResponse> allCustomers = customerService.getAllCustomers(page, size, sort);
+        PagingAndSortingRequest pagingAndSortingRequest = PagingAndSortingRequest.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .build();
+        Page<CustomerResponse> allCustomers = customerService.getAllCustomers(pagingAndSortingRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_CUSTOMER, allCustomers);
     }
 
@@ -52,4 +59,17 @@ public class CustomerController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_CUSTOMER, null);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> findCustomerByName(
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "name") String name) {
+        SearchCustomerRequest searchCustomerRequest = SearchCustomerRequest.builder()
+                .page(page)
+                .size(size)
+                .name(name)
+                .build();
+        Page<CustomerResponse> customerResponse = customerService.findCustomerByName(searchCustomerRequest);
+        return ResponseUtil.buildResponsePagination(HttpStatus.OK, "Successfully retrieve customer with " + name, customerResponse);
+    }
 }

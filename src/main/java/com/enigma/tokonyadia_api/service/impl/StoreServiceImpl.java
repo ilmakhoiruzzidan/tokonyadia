@@ -1,5 +1,7 @@
 package com.enigma.tokonyadia_api.service.impl;
 
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Store;
@@ -21,6 +23,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 @Service
 public class StoreServiceImpl implements StoreService {
+
     public final StoreRepository storeRepository;
 
     @Override
@@ -42,10 +45,9 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Page<StoreResponse> getAllStores(Integer page, Integer size, String sort) {
-        if (page <= 0) page = 1;
-        Sort sortBy = SortUtil.parseSort(sort);
-        Pageable pageable = PageRequest.of((page - 1), size, sortBy);
+    public Page<StoreResponse> getAllStores(PagingAndSortingRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Page<Store> storePage = storeRepository.findAll(pageable);
         return storePage.map(new Function<Store, StoreResponse>() {
             @Override
@@ -56,18 +58,16 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public StoreResponse updateStore(String id, StoreRequest request) {
+    public StoreResponse updateStore(StoreRequest request, String id) {
         Store newStore = getOne(id);
-        if (newStore != null) {
-            newStore.setName(request.getName());
-            newStore.setNoSiup(request.getNoSiup());
-            newStore.setAddress(request.getAddress());
-            newStore.setPhoneNumber(request.getPhoneNumber());
-            storeRepository.save(newStore);
-            return toStoreResponse(newStore);
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data toko tidak ditemukan");
+        newStore.setName(request.getName());
+        newStore.setNoSiup(request.getNoSiup());
+        newStore.setAddress(request.getAddress());
+        newStore.setPhoneNumber(request.getPhoneNumber());
+        storeRepository.save(newStore);
+        return toStoreResponse(newStore);
     }
+
 
     @Override
     public void deleteStore(String id) {
