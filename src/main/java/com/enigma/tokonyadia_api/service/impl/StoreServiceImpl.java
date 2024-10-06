@@ -1,6 +1,6 @@
 package com.enigma.tokonyadia_api.service.impl;
 
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.mapper.StoreMapper;
 import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -37,13 +37,13 @@ public class StoreServiceImpl implements StoreService {
                 .phoneNumber(request.getPhoneNumber())
                 .build();
         storeRepository.saveAndFlush(store);
-        return toStoreResponse(store);
+        return StoreMapper.toStoreResponse(store);
     }
 
     @Override
     public StoreResponse getStoreById(String id) {
         Store store = getOne(id);
-        return toStoreResponse(store);
+        return StoreMapper.toStoreResponse(store);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class StoreServiceImpl implements StoreService {
         return storePage.map(new Function<Store, StoreResponse>() {
             @Override
             public StoreResponse apply(Store store) {
-                return toStoreResponse(store);
+                return StoreMapper.toStoreResponse(store);
             }
         });
     }
@@ -68,9 +68,8 @@ public class StoreServiceImpl implements StoreService {
         newStore.setAddress(request.getAddress());
         newStore.setPhoneNumber(request.getPhoneNumber());
         storeRepository.save(newStore);
-        return toStoreResponse(newStore);
+        return StoreMapper.toStoreResponse(newStore);
     }
-
 
     @Override
     public void deleteStore(String id) {
@@ -88,15 +87,6 @@ public class StoreServiceImpl implements StoreService {
         return byId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Toko tidak ditemukan"));
     }
 
-    public StoreResponse toStoreResponse(Store store) {
-        return StoreResponse.builder()
-                .id(store.getId())
-                .name(store.getName())
-                .noSiup(store.getNoSiup())
-                .phoneNumber(store.getPhoneNumber())
-                .address(store.getAddress())
-                .build();
-    }
 
 }
 

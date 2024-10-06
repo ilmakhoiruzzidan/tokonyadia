@@ -3,6 +3,8 @@ package com.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @Setter
 @Getter
@@ -26,4 +28,7 @@ public class Store {
 
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "store")
+    private List<Product> product;
 }

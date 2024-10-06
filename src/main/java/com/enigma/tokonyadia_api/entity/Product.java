@@ -3,6 +3,8 @@ package com.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
@@ -24,8 +26,10 @@ public class Product {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "stock", nullable = false, columnDefinition = "int check(stock > 0)")
+    private Integer stock;
+
     @ManyToOne()
     @JoinColumn(name = "store_id")
     private Store store;
-
 }

@@ -17,7 +17,7 @@ public class StoreSpecification {
         return new Specification<Store>() {
             @Override
             public Predicate toPredicate(Root<Store> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-            List<Predicate> predicateList = new ArrayList<>();
+                List<Predicate> predicateList = new ArrayList<>();
                 if (!StringUtils.hasText(request.getQuery())) {
                     Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");
                     predicateList.add(predicate);

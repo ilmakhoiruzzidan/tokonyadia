@@ -18,14 +18,8 @@ public class ProductSpecification {
             @Override
             public Predicate toPredicate(Root<Product> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicateList = new ArrayList<>();
-                if (!StringUtils.hasText(request.getQuery())) {
-                    Predicate predicate = criteriaBuilder.or(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%"),
-                            criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + request.getQuery() + "%"));
-                    ;
-                    predicateList.add(predicate);
-                }
 
-                if (request.getQuery() != null) {
+                if (request.getQuery() != null && !StringUtils.hasText(request.getQuery())) {
                     Predicate predicate = criteriaBuilder.or(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%"),
                             criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + request.getQuery() + "%"));
                     predicateList.add(predicate);
