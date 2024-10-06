@@ -50,8 +50,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product getProduct(String productId) {
+        return productRepository.findById(productId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+    }
+
+    @Override
     public ProductResponse getProductById(String id) {
-        Product product = getOne(id);
+        Product product = this.getProduct(id);
         return ProductMapper.toProductResponse(product);
     }
 
@@ -72,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse updateProduct(ProductRequest request, String id) {
-        Product newProduct = getOne(id);
+        Product newProduct = this.getProduct(id);
         newProduct.setName(request.getName());
         newProduct.setPrice(request.getPrice());
         productRepository.save(newProduct);
@@ -81,18 +88,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(String id) {
-        Product product = getOne(id);
+        Product product = this.getProduct(id);
         if (product == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data produk tidak ada");
         } else {
             productRepository.delete(product);
         }
-    }
-
-    @Override
-    public Product getOne(String id) {
-        Optional<Product> product = productRepository.findById(id);
-        return product.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produk tidak ditemukan"));
     }
 
 }

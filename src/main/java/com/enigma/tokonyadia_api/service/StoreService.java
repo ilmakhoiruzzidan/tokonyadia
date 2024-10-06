@@ -17,6 +17,6 @@ public interface StoreService {
 
     void deleteStore(String id);
 
-    Store getOne(String id);
+    Store getStore(String id);
 
 }

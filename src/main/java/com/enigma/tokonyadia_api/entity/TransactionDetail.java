@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "t_transaction_detail")
+@Builder
 public class TransactionDetail {
 
     @Id

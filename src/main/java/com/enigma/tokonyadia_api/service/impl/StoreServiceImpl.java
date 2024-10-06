@@ -42,7 +42,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse getStoreById(String id) {
-        Store store = getOne(id);
+        Store store = getStore(id);
         return StoreMapper.toStoreResponse(store);
     }
 
@@ -62,7 +62,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse updateStore(StoreRequest request, String id) {
-        Store newStore = getOne(id);
+        Store newStore = getStore(id);
         newStore.setName(request.getName());
         newStore.setNoSiup(request.getNoSiup());
         newStore.setAddress(request.getAddress());
@@ -73,7 +73,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public void deleteStore(String id) {
-        Store store = getOne(id);
+        Store store = getStore(id);
         if (store == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data toko tidak ditemukan");
         } else {
@@ -82,9 +82,10 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Store getOne(String id) {
-        Optional<Store> byId = storeRepository.findById(id);
-        return byId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Toko tidak ditemukan"));
+    public Store getStore(String id) {
+        Optional<Store> store = storeRepository.findById(id);
+        return store.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Toko tidak ditemukan"));
     }
 
 
