@@ -1,6 +1,7 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.dto.mapper.CustomerMapper;
+import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.TransactionRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
@@ -20,10 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.function.Function;
 
-@Transactional
 @Service
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -37,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponse createTransaction(TransactionRequest request) {
         CustomerResponse customerResponse = customerService.getCustomerById(request.getCustomerId());
-        Customer customer = CustomerMapper.toCustomer(customerResponse);
+        Customer customer = Mapper.toCustomer(customerResponse);
         Transaction transaction = Transaction.builder()
                 .customer(customer)
                 .build();
@@ -59,11 +58,6 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Transaction> transactionSpecification = TransactionSpecification.getSpecification(request);
         Page<Transaction> transactionPage = transactionRepository.findAll(transactionSpecification, pageable);
-        return transactionPage.map(new Function<Transaction, Transaction>() {
-            @Override
-            public Transaction apply(Transaction transaction) {
-                return transaction;
-            }
-        });
+        return transactionPage.map();
     }
 }

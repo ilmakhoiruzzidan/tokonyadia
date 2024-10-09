@@ -1,6 +1,6 @@
 package com.enigma.tokonyadia_api.service.impl;
 
-import com.enigma.tokonyadia_api.dto.mapper.StoreMapper;
+import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -37,13 +37,13 @@ public class StoreServiceImpl implements StoreService {
                 .phoneNumber(request.getPhoneNumber())
                 .build();
         storeRepository.saveAndFlush(store);
-        return StoreMapper.toStoreResponse(store);
+        return Mapper.toStoreResponse(store);
     }
 
     @Override
     public StoreResponse getStoreById(String id) {
         Store store = getStore(id);
-        return StoreMapper.toStoreResponse(store);
+        return Mapper.toStoreResponse(store);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class StoreServiceImpl implements StoreService {
         return storePage.map(new Function<Store, StoreResponse>() {
             @Override
             public StoreResponse apply(Store store) {
-                return StoreMapper.toStoreResponse(store);
+                return Mapper.toStoreResponse(store);
             }
         });
     }
@@ -68,7 +68,7 @@ public class StoreServiceImpl implements StoreService {
         newStore.setAddress(request.getAddress());
         newStore.setPhoneNumber(request.getPhoneNumber());
         storeRepository.save(newStore);
-        return StoreMapper.toStoreResponse(newStore);
+        return Mapper.toStoreResponse(newStore);
     }
 
     @Override

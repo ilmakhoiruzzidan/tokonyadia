@@ -1,7 +1,6 @@
 package com.enigma.tokonyadia_api.service.impl;
 
-import com.enigma.tokonyadia_api.dto.mapper.ProductMapper;
-import com.enigma.tokonyadia_api.dto.mapper.StoreMapper;
+import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
@@ -23,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -37,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductRequest request) {
         StoreResponse storeResponse = storeService.getStoreById(request.getStoreId());
-        Store store = StoreMapper.toStore(storeResponse);
+        Store store = Mapper.toStore(storeResponse);
         Product product = Product.builder()
                 .store(store)
                 .name(request.getName())
@@ -46,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(request.getStock())
                 .build();
         productRepository.saveAndFlush(product);
-        return ProductMapper.toProductResponse(product);
+        return Mapper.toProductResponse(product);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getProductById(String id) {
         Product product = this.getProduct(id);
-        return ProductMapper.toProductResponse(product);
+        return Mapper.toProductResponse(product);
     }
 
 
@@ -72,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
         return productPage.map(new Function<Product, ProductResponse>() {
             @Override
             public ProductResponse apply(Product product) {
-                return ProductMapper.toProductResponse(product);
+                return Mapper.toProductResponse(product);
             }
         });
     }
@@ -83,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setName(request.getName());
         newProduct.setPrice(request.getPrice());
         productRepository.save(newProduct);
-        return ProductMapper.toProductResponse(newProduct);
+        return Mapper.toProductResponse(newProduct);
     }
 
     @Override
