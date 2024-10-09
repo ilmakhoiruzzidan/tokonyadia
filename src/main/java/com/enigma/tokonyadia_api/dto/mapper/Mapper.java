@@ -1,11 +1,7 @@
 package com.enigma.tokonyadia_api.dto.mapper;
 
-import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
-import com.enigma.tokonyadia_api.dto.response.ProductResponse;
-import com.enigma.tokonyadia_api.dto.response.StoreResponse;
-import com.enigma.tokonyadia_api.entity.Customer;
-import com.enigma.tokonyadia_api.entity.Product;
-import com.enigma.tokonyadia_api.entity.Store;
+import com.enigma.tokonyadia_api.dto.response.*;
+import com.enigma.tokonyadia_api.entity.*;
 
 public class Mapper {
     public static Customer toCustomer(CustomerResponse customerResponse) {
@@ -14,6 +10,15 @@ public class Mapper {
                 .name(customerResponse.getName())
                 .email(customerResponse.getEmail())
                 .phoneNumber(customerResponse.getPhoneNumber())
+                .build();
+    }
+
+    public static CustomerResponse toCustomerResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .email(customer.getEmail())
+                .phoneNumber(customer.getPhoneNumber())
                 .build();
     }
 
@@ -58,6 +63,43 @@ public class Mapper {
                 .phoneNumber(storeResponse.getPhoneNumber())
                 .address(storeResponse.getAddress())
                 .noSiup(storeResponse.getNoSiup())
+                .build();
+    }
+
+    public static TransactionResponse toTransactionResponse(Transaction transaction){
+        CustomerResponse customerResponse = CustomerResponse.builder()
+                .id(transaction.getCustomer().getId())
+                .name(transaction.getCustomer().getName())
+                .email(transaction.getCustomer().getEmail())
+                .phoneNumber(transaction.getCustomer().getPhoneNumber())
+                .build();
+        return TransactionResponse.builder()
+                .transactionId(transaction.getId())
+                .transactionDate(transaction.getTransDate())
+                .customer(customerResponse)
+                .build();
+    }
+
+    public static TransactionDetailResponse toTransactionDetailResponse (TransactionDetail transactionDetail){
+        Transaction transaction = Transaction.builder()
+                .id(transactionDetail.getTransaction().getId())
+                .transDate(transactionDetail.getTransaction().getTransDate())
+                .customer(transactionDetail.getTransaction().getCustomer())
+                .build();
+
+        Product product = Product.builder()
+                .id(transactionDetail.getProduct().getId())
+                .name(transactionDetail.getProduct().getName())
+                .description(transactionDetail.getProduct().getDescription())
+                .store(transactionDetail.getProduct().getStore())
+                .stock(transactionDetail.getProduct().getStock())
+                .build();
+
+        return TransactionDetailResponse.builder()
+                .id(transactionDetail.getId())
+                .qty(transactionDetail.getQty())
+                .transaction(Mapper.toTransactionResponse(transaction))
+                .product(Mapper.toProductResponse(product))
                 .build();
     }
 }

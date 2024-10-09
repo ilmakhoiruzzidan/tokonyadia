@@ -24,4 +24,12 @@ public class Constant {
     public static final String SUCCESS_UPDATE_CUSTOMER = "Successfully update customer";
     public static final String SUCCESS_GET_CUSTOMER_BY_ID = "Successfully retrieve customer by id";
     public static final String SUCCESS_DELETE_CUSTOMER = "Successfully delete customer";
+
+    public static final String SUCCESS_GET_TRANSACTION_BY_ID = "Successfully retrieve transaction";
+    public static final String SUCCESS_GET_ALL_TRANSACTION = "Successfully retrieved all transaction";
+    public static final String SUCCESS_UPDATE_TRANSACTION = "Successfully update transaction";
+
+    public static final String ERROR_TRANSACTION_NOT_FOUND = "Transaction Not Found";
+
+    public static final String SUCCESS_GET_TRANSACTION_DETAIL = "Successfully retrieve transaction detail";
 }

@@ -13,8 +13,7 @@ public class TransactionSpecification {
         return new Specification<Transaction>() {
             @Override
             public Predicate toPredicate(Root<Transaction> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                Predicate predicate = criteriaBuilder.conjunction();
-                return predicate;
+                return criteriaBuilder.conjunction();
             }
         };
     }
