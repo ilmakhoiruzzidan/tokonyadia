@@ -26,7 +26,7 @@ public class TransactionDetailServiceImpl implements TransactionDetailService {
         ArrayList<TransactionDetail> transactionDetails = new ArrayList<>();
 
         for (TransactionDetailRequest transactionDetail : transactionDetailRequests) {
-            Product product = productService.getProduct(transactionDetail.getProductId());
+            Product product = productService.getOne(transactionDetail.getProductId());
 
             TransactionDetail td = TransactionDetail.builder()
                     .product(product)

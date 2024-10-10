@@ -2,6 +2,7 @@ package com.enigma.tokonyadia_api.service;
 
 import com.enigma.tokonyadia_api.dto.request.DraftTransactionRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
 import com.enigma.tokonyadia_api.dto.request.TransactionRequest;
 import com.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.TransactionResponse;
@@ -15,7 +16,8 @@ public interface TransactionService {
     List<TransactionDetailResponse> getTransactionDetails(String transactionId);
     TransactionResponse getTransactionById(String transactionId);
     Transaction getOne(String transactionId);
-    Page<Transaction> getAllTransactions(PagingAndSortingRequest request);
+    Page<TransactionResponse> getAllTransactions(PagingAndSortingRequest request);
     TransactionResponse updateTransaction(String transactionId, TransactionRequest request);
     TransactionResponse deleteTransaction(String transactionId);
+    TransactionResponse addTransactionDetail(String transactionId, TransactionDetailRequest request);
 }

@@ -3,6 +3,7 @@ package com.enigma.tokonyadia_api.controller;
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.DraftTransactionRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
 import com.enigma.tokonyadia_api.dto.request.TransactionRequest;
 import com.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.TransactionResponse;
@@ -35,6 +36,11 @@ public class TransactionController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_TRANSACTION_DETAIL, transactionDetailResponses);
     }
 
+    @PostMapping("/{transactionId}/details")
+    public ResponseEntity<?> addTransactionToDetails(@PathVariable String transactionId, @RequestBody TransactionDetailRequest request){
+        TransactionResponse transactionResponse = transactionService.addTransactionDetail(transactionId, request);
+        return ResponseUtil.buildResponse(HttpStatus.OK, "Successfully add transaction details", transactionResponse);
+    }
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
@@ -46,25 +52,25 @@ public class TransactionController {
                 .size(size)
                 .sortBy(sortBy)
                 .build();
-        Page<Transaction> transactionPage = transactionService.getAllTransactions(pagingAndSortingRequest);
+        Page<TransactionResponse> transactionPage = transactionService.getAllTransactions(pagingAndSortingRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, "OK", transactionPage);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getTransactionById(@PathVariable String id) {
-        TransactionResponse transactionResponse = transactionService.getTransactionById(id);
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<?> getTransactionById(@PathVariable String transactionId) {
+        TransactionResponse transactionResponse = transactionService.getTransactionById(transactionId);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_TRANSACTION_BY_ID, transactionResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTransaction(@PathVariable String id, @RequestBody TransactionRequest transactionRequest) {
-        TransactionResponse transactionResponse = transactionService.updateTransaction(id, transactionRequest);
+    @PutMapping("/{transactionId}")
+    public ResponseEntity<?> updateTransaction(@PathVariable String transactionId, @RequestBody TransactionRequest transactionRequest) {
+        TransactionResponse transactionResponse = transactionService.updateTransaction(transactionId, transactionRequest);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_TRANSACTION, transactionResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTransactionById(@PathVariable String id) {
-        TransactionResponse transactionResponse = transactionService.deleteTransaction(id);
+    @DeleteMapping("/{transactionId}")
+    public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId) {
+        transactionService.deleteTransaction(transactionId);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_ALL_TRANSACTION, null);
     }
 }

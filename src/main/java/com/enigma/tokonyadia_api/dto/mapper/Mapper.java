@@ -3,6 +3,11 @@ package com.enigma.tokonyadia_api.dto.mapper;
 import com.enigma.tokonyadia_api.dto.response.*;
 import com.enigma.tokonyadia_api.entity.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class Mapper {
     public static Customer toCustomer(CustomerResponse customerResponse) {
         return Customer.builder()
@@ -67,16 +72,27 @@ public class Mapper {
     }
 
     public static TransactionResponse toTransactionResponse(Transaction transaction){
+
         CustomerResponse customerResponse = CustomerResponse.builder()
                 .id(transaction.getCustomer().getId())
                 .name(transaction.getCustomer().getName())
                 .email(transaction.getCustomer().getEmail())
                 .phoneNumber(transaction.getCustomer().getPhoneNumber())
                 .build();
+
+        List<SimpleTransactionDetailResponse> transactionDetailResponses = transaction.getTransactionDetails().stream()
+                .map(transactionDetail -> SimpleTransactionDetailResponse.builder()
+                        .id(transactionDetail.getId())
+                        .product(Mapper.toProductResponse(transactionDetail.getProduct()))
+                        .qty(transactionDetail.getQty())
+                        .build())
+                .toList();
+
         return TransactionResponse.builder()
                 .transactionId(transaction.getId())
                 .transactionDate(transaction.getTransDate())
                 .customer(customerResponse)
+                .transactionDetail(transactionDetailResponses)
                 .build();
     }
 

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +16,5 @@ public class TransactionResponse {
     private String transactionId;
     private LocalDateTime transactionDate;
     private CustomerResponse customer;
+    private List<SimpleTransactionDetailResponse> transactionDetail;
 }
