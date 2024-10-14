@@ -1,8 +1,8 @@
 package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
+import com.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.service.CustomerService;
@@ -11,9 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping(path = Constant.PATH_CUSTOMER)
+@RequestMapping(path = Constant.CUSTOMER_API)
 @RestController
 @RequiredArgsConstructor
 public class CustomerController {
@@ -21,7 +22,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<?> saveCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<?> saveCustomer(@RequestBody CustomerCreateRequest request) {
         CustomerResponse customerResponse = customerService.createCustomer(request);
         return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_CUSTOMER, customerResponse);
     }
@@ -30,7 +31,7 @@ public class CustomerController {
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(name = "q") String query,
+            @RequestParam(name = "q", required = false) String query,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
         SearchCustomerRequest searchCustomerRequest = SearchCustomerRequest.builder()
@@ -49,6 +50,7 @@ public class CustomerController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_CUSTOMER_BY_ID, customerResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and @permissionEvaluationServiceImpl.hasAccessToCustomer(#id, authentication.principal.id))")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(@PathVariable String id, @RequestBody CustomerRequest request) {
         CustomerResponse customerResponse = customerService.updateCustomer(id, request);

@@ -1,18 +1,13 @@
 package com.enigma.tokonyadia_api.dto.request;
 
-
 import lombok.*;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class ProductRequest{
+public class CategoryRequest {
     private String name;
     private String description;
-    private Long price;
-    private Integer stock;
-    private String categoryId;
-    private String storeId;
 }

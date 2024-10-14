@@ -17,6 +17,7 @@ public class ProductSpecification {
         return new Specification<Product>() {
             @Override
             public Predicate toPredicate(Root<Product> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                if (request.getQuery() == null) return criteriaBuilder.conjunction();
                 List<Predicate> predicateList = new ArrayList<>();
 
                 if (request.getQuery() != null && !StringUtils.hasText(request.getQuery())) {

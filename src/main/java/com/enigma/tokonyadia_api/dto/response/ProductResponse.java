@@ -16,4 +16,6 @@ public class ProductResponse {
     private Long price;
     private Integer stock;
     private StoreResponse store;
+    private String categoryId;
+    private String categoryName;
 }

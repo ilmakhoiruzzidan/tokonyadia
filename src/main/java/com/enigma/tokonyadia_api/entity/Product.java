@@ -29,7 +29,11 @@ public class Product {
     @Column(name = "stock", nullable = false, columnDefinition = "int check(stock > 0)")
     private Integer stock;
 
-    @ManyToOne()
-    @JoinColumn(name = "store_id")
+    @ManyToOne
+    @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

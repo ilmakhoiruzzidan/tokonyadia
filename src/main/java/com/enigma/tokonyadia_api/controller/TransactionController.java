@@ -4,12 +4,11 @@ import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.DraftTransactionRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
-import com.enigma.tokonyadia_api.dto.request.TransactionRequest;
 import com.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.TransactionResponse;
-import com.enigma.tokonyadia_api.entity.Transaction;
 import com.enigma.tokonyadia_api.service.TransactionService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -37,10 +36,11 @@ public class TransactionController {
     }
 
     @PostMapping("/{transactionId}/details")
-    public ResponseEntity<?> addTransactionToDetails(@PathVariable String transactionId, @RequestBody TransactionDetailRequest request){
+    public ResponseEntity<?> addTransactionToDetails(@PathVariable String transactionId, @Valid @RequestBody TransactionDetailRequest request) {
         TransactionResponse transactionResponse = transactionService.addTransactionDetail(transactionId, request);
         return ResponseUtil.buildResponse(HttpStatus.OK, "Successfully add transaction details", transactionResponse);
     }
+
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
@@ -62,15 +62,15 @@ public class TransactionController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_TRANSACTION_BY_ID, transactionResponse);
     }
 
-    @PutMapping("/{transactionId}")
-    public ResponseEntity<?> updateTransaction(@PathVariable String transactionId, @RequestBody TransactionRequest transactionRequest) {
-        TransactionResponse transactionResponse = transactionService.updateTransaction(transactionId, transactionRequest);
+    @PutMapping("/{transactionId}/details/{detailsId}")
+    public ResponseEntity<?> updateTransactionDetail(@PathVariable String transactionId, @PathVariable String detailsId, @Valid @RequestBody TransactionDetailRequest transactionDetailRequest) {
+        TransactionResponse transactionResponse = transactionService.updateTransactionDetails(transactionId, detailsId, transactionDetailRequest);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_TRANSACTION, transactionResponse);
     }
 
-    @DeleteMapping("/{transactionId}")
-    public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId) {
-        transactionService.deleteTransaction(transactionId);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_ALL_TRANSACTION, null);
+    @DeleteMapping("/{transactionId}/details/{detailsId}")
+    public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId, @PathVariable String detailsId) {
+        transactionService.deleteTransactionDetails(transactionId, detailsId);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAILS, null);
     }
 }

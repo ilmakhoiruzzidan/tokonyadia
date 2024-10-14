@@ -3,11 +3,14 @@ package com.enigma.tokonyadia_api.service.impl;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
+import com.enigma.tokonyadia_api.dto.response.CategoryResponse;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
+import com.enigma.tokonyadia_api.entity.Category;
 import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.ProductRepository;
+import com.enigma.tokonyadia_api.service.CategoryService;
 import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.specification.ProductSpecification;
@@ -29,19 +32,20 @@ import java.util.function.Function;
 public class ProductServiceImpl implements ProductService {
 
     private final StoreService storeService;
-
+    private final CategoryService categoryService;
     private final ProductRepository productRepository;
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
-        StoreResponse storeResponse = storeService.getStoreById(request.getStoreId());
-        Store store = Mapper.toStore(storeResponse);
+        Store store = storeService.getOne(request.getStoreId());
+        Category category = categoryService.getOne(request.getCategoryId());
         Product product = Product.builder()
                 .store(store)
                 .name(request.getName())
                 .price(request.getPrice())
                 .description(request.getDescription())
                 .stock(request.getStock())
+                .category(category)
                 .build();
         productRepository.saveAndFlush(product);
         return Mapper.toProductResponse(product);
@@ -67,12 +71,7 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Product> productSpecification = ProductSpecification.getSpecification(request);
         Page<Product> productPage = productRepository.findAll(productSpecification, pageable);
-        return productPage.map(new Function<Product, ProductResponse>() {
-            @Override
-            public ProductResponse apply(Product product) {
-                return Mapper.toProductResponse(product);
-            }
-        });
+        return productPage.map(Mapper::toProductResponse);
     }
 
     @Override
@@ -87,11 +86,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(String id) {
         Product product = getOne(id);
-        if (product == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data produk tidak ada");
-        } else {
-            productRepository.delete(product);
-        }
+        productRepository.delete(product);
+
     }
 
 }

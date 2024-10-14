@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.service;
 
+import com.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CustomerService {
-    CustomerResponse createCustomer(CustomerRequest request);
+    CustomerResponse createCustomer(CustomerCreateRequest request);
 
     CustomerResponse getCustomerById(String id);
 

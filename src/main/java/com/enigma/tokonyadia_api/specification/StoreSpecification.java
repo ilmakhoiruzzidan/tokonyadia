@@ -17,21 +17,14 @@ public class StoreSpecification {
         return new Specification<Store>() {
             @Override
             public Predicate toPredicate(Root<Store> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-
-                Predicate conjunctionPredicate = criteriaBuilder.conjunction();
+                if (request.getQuery() == null) return criteriaBuilder.conjunction();
 
                 List<Predicate> predicateList = new ArrayList<>();
-                if (!StringUtils.hasText(request.getQuery())) {
+                if (!StringUtils.hasText(request.getQuery()) || request.getQuery() != null) {
                     Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");
                     predicateList.add(predicate);
                 }
 
-                if (request.getQuery() != null) {
-                    Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");
-                    predicateList.add(predicate);
-                }
-
-                if (predicateList.isEmpty()) return criteriaBuilder.conjunction();
                 return query.where(predicateList.toArray(new Predicate[]{})).getRestriction();
             }
         };

@@ -71,7 +71,7 @@ public class Mapper {
                 .build();
     }
 
-    public static TransactionResponse toTransactionResponse(Transaction transaction){
+    public static TransactionResponse toTransactionResponse(Transaction transaction) {
 
         CustomerResponse customerResponse = CustomerResponse.builder()
                 .id(transaction.getCustomer().getId())
@@ -96,7 +96,7 @@ public class Mapper {
                 .build();
     }
 
-    public static TransactionDetailResponse toTransactionDetailResponse (TransactionDetail transactionDetail){
+    public static TransactionDetailResponse toTransactionDetailResponse(TransactionDetail transactionDetail) {
         Transaction transaction = Transaction.builder()
                 .id(transactionDetail.getTransaction().getId())
                 .transDate(transactionDetail.getTransaction().getTransDate())
@@ -116,6 +116,30 @@ public class Mapper {
                 .qty(transactionDetail.getQty())
                 .transaction(Mapper.toTransactionResponse(transaction))
                 .product(Mapper.toProductResponse(product))
+                .build();
+    }
+
+    public static UserResponse toUserResponse(UserAccount userAccount) {
+        return UserResponse.builder()
+                .id(userAccount.getId())
+                .username(userAccount.getUsername())
+                .role(userAccount.getRole().getDescription())
+                .build();
+    }
+
+    public static RegisterResponse toRegisterResponse(UserAccount userAccount) {
+        return RegisterResponse.builder()
+                .id(userAccount.getId())
+                .username(userAccount.getUsername())
+                .role(userAccount.getRole().getDescription())
+                .build();
+    }
+
+    public static CategoryResponse toCategoryResponse(Category category) {
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
                 .build();
     }
 }

@@ -17,6 +17,8 @@ public class CustomerSpecification {
         return new Specification<Customer>() {
             @Override
             public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                if (request.getQuery() == null) return criteriaBuilder.conjunction();
+
                 List<Predicate> predicateList = new ArrayList<>();
                 if (!StringUtils.hasText(request.getQuery())) {
                     Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");

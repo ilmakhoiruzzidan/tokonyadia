@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.service.impl;
 
+import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
@@ -42,7 +43,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse getStoreById(String id) {
-        Store store = getStore(id);
+        Store store = getOne(id);
         return Mapper.toStoreResponse(store);
     }
 
@@ -62,7 +63,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse updateStore(StoreRequest request, String id) {
-        Store newStore = getStore(id);
+        Store newStore = getOne(id);
         newStore.setName(request.getName());
         newStore.setNoSiup(request.getNoSiup());
         newStore.setAddress(request.getAddress());
@@ -73,19 +74,16 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public void deleteStore(String id) {
-        Store store = getStore(id);
-        if (store == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data toko tidak ditemukan");
-        } else {
-            storeRepository.delete(store);
-        }
+        Store store = getOne(id);
+        storeRepository.delete(store);
     }
 
+
     @Override
-    public Store getStore(String id) {
+    public Store getOne(String id) {
         Optional<Store> store = storeRepository.findById(id);
         return store.orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Toko tidak ditemukan"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_STORE_NOT_FOUND));
     }
 
 

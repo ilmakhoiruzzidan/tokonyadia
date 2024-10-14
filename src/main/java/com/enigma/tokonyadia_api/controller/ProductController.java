@@ -3,7 +3,6 @@ package com.enigma.tokonyadia_api.controller;
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
-import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
 import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
@@ -13,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping(path = Constant.PATH_PRODUCT)
+@RequestMapping(path = Constant.PRODUCT_API)
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
@@ -31,7 +30,7 @@ public class ProductController {
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(name = "maxPrice", required = false) Long maxPrice,
             @RequestParam(name = "minPrice", required = false) Long minPrice,
-            @RequestParam(name = "q") String query,
+            @RequestParam(name = "q", required = false) String query,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
         SearchProductRequest searchProductRequest = SearchProductRequest.builder()

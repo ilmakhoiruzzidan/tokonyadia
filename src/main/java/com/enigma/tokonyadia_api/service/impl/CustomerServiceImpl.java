@@ -1,15 +1,15 @@
 package com.enigma.tokonyadia_api.service.impl;
 
-import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
-import com.enigma.tokonyadia_api.dto.request.ProductRequest;
-import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
+import com.enigma.tokonyadia_api.constant.UserRole;
+import com.enigma.tokonyadia_api.dto.request.*;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
 import com.enigma.tokonyadia_api.entity.Store;
+import com.enigma.tokonyadia_api.entity.UserAccount;
 import com.enigma.tokonyadia_api.repository.CustomerRepository;
 import com.enigma.tokonyadia_api.service.CustomerService;
+import com.enigma.tokonyadia_api.service.UserService;
 import com.enigma.tokonyadia_api.specification.CustomerSpecification;
 import com.enigma.tokonyadia_api.utils.SortUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +30,23 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-
+    private final UserService userService;
     public final CustomerRepository customerRepository;
 
     @Override
-    public CustomerResponse createCustomer(CustomerRequest request) {
+    public CustomerResponse createCustomer(CustomerCreateRequest request) {
+        UserAccount userAccount = UserAccount.builder()
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role(UserRole.ROLE_CUSTOMER)
+                .build();
+        userService.create(userAccount);
+
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
+                .userAccount(userAccount)
                 .build();
         customerRepository.saveAndFlush(customer);
         return toCustomerResponse(customer);

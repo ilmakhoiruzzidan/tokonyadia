@@ -2,12 +2,9 @@ package com.enigma.tokonyadia_api.controller;
 
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
-import com.enigma.tokonyadia_api.dto.response.ProductResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
-import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
 import lombok.AllArgsConstructor;
@@ -18,14 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
-@RequestMapping(path = Constant.PATH_STORE)
+@RequestMapping(path = Constant.STORE_API)
 public class StoreController {
 
-    @Autowired
     public final StoreService storeService;
 
     @PostMapping
@@ -38,7 +32,7 @@ public class StoreController {
     public ResponseEntity<?> getAllStores(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam(name = "q") String query,
+            @RequestParam(name = "q", required = false) String query,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
         SearchStoreRequest searchStoreRequest = SearchStoreRequest.builder()

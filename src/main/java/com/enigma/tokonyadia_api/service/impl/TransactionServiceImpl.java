@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final ProductService productService;
     private final CustomerService customerService;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse createDraft(DraftTransactionRequest request) {
         Customer customer = customerService.getOne(request.getCustomerId());
@@ -50,6 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
         return Mapper.toTransactionResponse(savedTransaction);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<TransactionDetailResponse> getTransactionDetails(String transactionId) {
         Transaction transaction = getOne(transactionId);
@@ -58,11 +61,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse addTransactionDetail(String transactionId, TransactionDetailRequest request) {
         Transaction transaction = getOne(transactionId);
         if (transaction.getStatus() != TransactionStatus.DRAFT) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only add items to draft transaction");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_NON_DRAFT);
         }
         Product product = productService.getOne(request.getProductId());
 
@@ -87,12 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         return Mapper.toTransactionResponse(updateTransaction);
     }
 
-    @Override
-    public TransactionResponse getTransactionById(String transactionId) {
-        Transaction transaction = getOne(transactionId);
-        return Mapper.toTransactionResponse(transaction);
-    }
-
+    @Transactional(readOnly = true)
     @Override
     public Page<TransactionResponse> getAllTransactions(PagingAndSortingRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
@@ -102,19 +101,47 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionPage.map(Mapper::toTransactionResponse);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public TransactionResponse updateTransaction(String transactionId, TransactionRequest request) {
+    public TransactionResponse updateTransactionDetails(String transactionId, String detailsId, TransactionDetailRequest request) {
         Transaction transaction = getOne(transactionId);
         // TODO : Update transactionDetail
-        return null;
+        if (transaction.getStatus() != TransactionStatus.DRAFT)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_UPDATE_ITEMS_NON_DRAFT);
+
+        TransactionDetail transactionDetail = transaction.getTransactionDetails().stream()
+                .filter(details -> details.getId().equals(detailsId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_TRANSACTION_DETAIL_NOT_FOUND));
+
+        Product product = productService.getOne(request.getProductId());
+        transactionDetail.setProduct(product);
+        transactionDetail.setQty(request.getQty());
+        transactionDetail.setPrice(product.getPrice());
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+        return Mapper.toTransactionResponse(updatedTransaction);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public TransactionResponse deleteTransaction(String transactionId) {
+    public TransactionResponse deleteTransactionDetails(String transactionId, String detailsId) {
+        Transaction transaction = getOne(transactionId);
+        if (transaction.getStatus() != TransactionStatus.DRAFT)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_REMOVE_ITEMS_FROM_NON_DRAFT);
+
+        transaction.getTransactionDetails().removeIf(details -> details.getId().equals(detailsId));
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+        return Mapper.toTransactionResponse(updatedTransaction);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public TransactionResponse getTransactionById(String transactionId) {
         Transaction transaction = getOne(transactionId);
         return Mapper.toTransactionResponse(transaction);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Transaction getOne(String transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
