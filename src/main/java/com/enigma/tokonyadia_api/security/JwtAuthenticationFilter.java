@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = parseToken(bearerToken);
             // set authentication ke SecurityContextHolder
             if (token != null) {
-                String userIdFromToken = jwtService.getUserIdFromToken(token);
+                String userIdFromToken = jwtService.getUserId(token);
                 // get user account by id
                 UserAccount userAccount = userService.getById(userIdFromToken);
                 // set authentication ke SecurityContextHolder

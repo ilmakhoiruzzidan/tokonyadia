@@ -3,14 +3,12 @@ package com.enigma.tokonyadia_api.service.impl;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
-import com.enigma.tokonyadia_api.dto.response.CategoryResponse;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
-import com.enigma.tokonyadia_api.dto.response.StoreResponse;
 import com.enigma.tokonyadia_api.entity.Category;
 import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.ProductRepository;
-import com.enigma.tokonyadia_api.service.CategoryService;
+import com.enigma.tokonyadia_api.service.ProductCategoryService;
 import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.specification.ProductSpecification;
@@ -25,20 +23,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.function.Function;
-
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final StoreService storeService;
-    private final CategoryService categoryService;
+    private final ProductCategoryService productCategoryService;
     private final ProductRepository productRepository;
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
         Store store = storeService.getOne(request.getStoreId());
-        Category category = categoryService.getOne(request.getCategoryId());
+        Category category = productCategoryService.getOne(request.getCategoryId());
         Product product = Product.builder()
                 .store(store)
                 .name(request.getName())
@@ -63,7 +59,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = getOne(id);
         return Mapper.toProductResponse(product);
     }
-
 
     @Override
     public Page<ProductResponse> getAllProducts(SearchProductRequest request) {

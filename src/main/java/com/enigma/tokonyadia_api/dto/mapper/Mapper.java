@@ -3,10 +3,7 @@ package com.enigma.tokonyadia_api.dto.mapper;
 import com.enigma.tokonyadia_api.dto.response.*;
 import com.enigma.tokonyadia_api.entity.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Mapper {
     public static Customer toCustomer(CustomerResponse customerResponse) {
@@ -34,6 +31,7 @@ public class Mapper {
                 .name(product.getName())
                 .price(product.getPrice())
                 .store(toStoreResponse(product.getStore()))
+                .category(toCategoryResponse(product.getCategory()))
                 .description(product.getDescription())
                 .stock(product.getStock())
                 .build();
@@ -46,7 +44,6 @@ public class Mapper {
                 .description(productResponse.getDescription())
                 .build();
     }
-
 
     public static StoreResponse toStoreResponse(Store store) {
         return StoreResponse.builder()
@@ -85,6 +82,7 @@ public class Mapper {
                         .id(transactionDetail.getId())
                         .product(Mapper.toProductResponse(transactionDetail.getProduct()))
                         .qty(transactionDetail.getQty())
+                        .price(transactionDetail.getPrice())
                         .build())
                 .toList();
 
@@ -135,8 +133,8 @@ public class Mapper {
                 .build();
     }
 
-    public static CategoryResponse toCategoryResponse(Category category) {
-        return CategoryResponse.builder()
+    public static ProductCategoryResponse toCategoryResponse(Category category) {
+        return ProductCategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .description(category.getDescription())

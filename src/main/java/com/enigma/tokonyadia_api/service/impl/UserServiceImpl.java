@@ -4,11 +4,13 @@ import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.UserRole;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.UserRequest;
+import com.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import com.enigma.tokonyadia_api.dto.response.UserResponse;
 
 import com.enigma.tokonyadia_api.entity.UserAccount;
 import com.enigma.tokonyadia_api.repository.UserAccountRepository;
 import com.enigma.tokonyadia_api.service.UserService;
+import com.enigma.tokonyadia_api.utils.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +28,15 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserAccountRepository userAccountRepository;
-    private final PasswordEncoder passwordEncoder;
-
     @Value("${tokonyadia.user-admin}")
     private String USERNAME_ADMIN;
-
     @Value("${tokonyadia.user-password}")
     private String PASSWORD_ADMIN;
+
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ValidationUtil validationUtil;
+
 
     @PostConstruct
     public void initUser(){
@@ -90,6 +93,20 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
         return Mapper.toUserResponse(userAccount);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updatePassword(String id, UserUpdatePasswordRequest request) {
+        validationUtil.validate(request);
+        UserAccount userAccount = getById(id);
+
+        if (!passwordEncoder.matches(userAccount.getPassword(), request.getCurrentPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.INVALID_CREDENTIAL);
+        }
+
+        userAccount.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userAccountRepository.saveAndFlush(userAccount);
     }
 
     @Override

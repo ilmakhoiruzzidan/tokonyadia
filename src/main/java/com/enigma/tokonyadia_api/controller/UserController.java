@@ -2,12 +2,14 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.UserRequest;
+import com.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import com.enigma.tokonyadia_api.dto.response.UserResponse;
 import com.enigma.tokonyadia_api.service.UserService;
 import com.enigma.tokonyadia_api.utils.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
         UserResponse userResponse = userService.create(request);
@@ -28,8 +31,9 @@ public class UserController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_CURRENT_USER_INFO, userResponse);
     }
 
-    @PutMapping("/me/update")
-    public ResponseEntity<?> updateUser(){
-        return null;
+    @PutMapping("/{id}/update")
+    public ResponseEntity<?> updatePassword(@PathVariable String id, @RequestBody UserUpdatePasswordRequest request) {
+        userService.updatePassword(id, request);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PASSWORD, null);
     }
 }

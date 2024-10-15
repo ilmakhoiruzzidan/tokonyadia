@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryResponse {
+public class ProductCategoryResponse {
     private String id;
     private String name;
     private String description;

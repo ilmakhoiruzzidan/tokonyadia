@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
-public class CategorySpecification {
+public class ProductCategorySpecification {
     public static Specification<Category> getSpecification(PagingAndSortingRequest request) {
         return new Specification<Category>() {
             @Override

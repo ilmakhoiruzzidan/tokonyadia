@@ -71,6 +71,6 @@ public class TransactionController {
     @DeleteMapping("/{transactionId}/details/{detailsId}")
     public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId, @PathVariable String detailsId) {
         transactionService.deleteTransactionDetails(transactionId, detailsId);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAILS, null);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAIL, null);
     }
 }
