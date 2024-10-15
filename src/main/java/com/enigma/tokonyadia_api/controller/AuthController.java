@@ -29,8 +29,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request);
+        setCookie(response, authResponse.getRefreshToken());
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_AUTH_LOGIN_USER, authResponse);
     }
 

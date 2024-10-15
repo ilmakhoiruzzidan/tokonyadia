@@ -6,24 +6,6 @@ import com.enigma.tokonyadia_api.entity.*;
 import java.util.List;
 
 public class Mapper {
-    public static Customer toCustomer(CustomerResponse customerResponse) {
-        return Customer.builder()
-                .id(customerResponse.getId())
-                .name(customerResponse.getName())
-                .email(customerResponse.getEmail())
-                .phoneNumber(customerResponse.getPhoneNumber())
-                .build();
-    }
-
-    public static CustomerResponse toCustomerResponse(Customer customer) {
-        return CustomerResponse.builder()
-                .id(customer.getId())
-                .name(customer.getName())
-                .email(customer.getEmail())
-                .phoneNumber(customer.getPhoneNumber())
-                .build();
-    }
-
 
     public static ProductResponse toProductResponse(Product product) {
         return ProductResponse.builder()
@@ -37,14 +19,6 @@ public class Mapper {
                 .build();
     }
 
-    public static Product toProduct(ProductResponse productResponse) {
-        return Product.builder()
-                .id(productResponse.getId())
-                .name(productResponse.getName())
-                .description(productResponse.getDescription())
-                .build();
-    }
-
     public static StoreResponse toStoreResponse(Store store) {
         return StoreResponse.builder()
                 .id(store.getId())
@@ -52,19 +26,6 @@ public class Mapper {
                 .noSiup(store.getNoSiup())
                 .phoneNumber(store.getPhoneNumber())
                 .address(store.getAddress())
-                .build();
-    }
-
-    public static Store toStore(StoreResponse storeResponse) {
-        if (storeResponse == null) {
-            throw new IllegalArgumentException("StoreResponse tidak boleh null");
-        }
-        return Store.builder()
-                .id(storeResponse.getId())
-                .name(storeResponse.getName())
-                .phoneNumber(storeResponse.getPhoneNumber())
-                .address(storeResponse.getAddress())
-                .noSiup(storeResponse.getNoSiup())
                 .build();
     }
 

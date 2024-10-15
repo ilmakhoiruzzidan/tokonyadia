@@ -3,8 +3,6 @@ package com.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Builder
 @Getter
 @Setter

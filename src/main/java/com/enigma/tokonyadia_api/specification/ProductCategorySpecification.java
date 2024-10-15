@@ -10,11 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class ProductCategorySpecification {
     public static Specification<Category> getSpecification(PagingAndSortingRequest request) {
-        return new Specification<Category>() {
-            @Override
-            public Predicate toPredicate(Root<Category> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                return criteriaBuilder.conjunction();
-            }
-        };
+        return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
     }
 }

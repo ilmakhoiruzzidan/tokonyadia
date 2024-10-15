@@ -1,7 +1,6 @@
 package com.enigma.tokonyadia_api.dto.request;
 
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
-import com.enigma.tokonyadia_api.service.StoreService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
