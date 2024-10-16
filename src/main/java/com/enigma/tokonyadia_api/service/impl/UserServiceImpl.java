@@ -10,7 +10,7 @@ import com.enigma.tokonyadia_api.dto.response.UserResponse;
 import com.enigma.tokonyadia_api.entity.UserAccount;
 import com.enigma.tokonyadia_api.repository.UserAccountRepository;
 import com.enigma.tokonyadia_api.service.UserService;
-import com.enigma.tokonyadia_api.utils.ValidationUtil;
+import com.enigma.tokonyadia_api.util.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
 
     @PostConstruct
-    public void initUser(){
+    public void initUser() {
         boolean isExist = userAccountRepository.existsByUsername(USERNAME_ADMIN);
         if (isExist) return;
         UserAccount userAccount = UserAccount.builder()
@@ -74,7 +74,6 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserAccount create(UserAccount userAccount) {
-        userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
         return userAccountRepository.saveAndFlush(userAccount);
     }
 
@@ -101,7 +100,7 @@ public class UserServiceImpl implements UserService {
         validationUtil.validate(request);
         UserAccount userAccount = getById(id);
 
-        if (!passwordEncoder.matches(userAccount.getPassword(), request.getCurrentPassword())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), userAccount.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.INVALID_CREDENTIAL);
         }
 

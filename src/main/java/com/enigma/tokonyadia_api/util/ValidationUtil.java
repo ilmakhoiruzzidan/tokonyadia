@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.utils;
+package com.enigma.tokonyadia_api.util;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

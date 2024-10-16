@@ -9,7 +9,7 @@ import com.enigma.tokonyadia_api.entity.Category;
 import com.enigma.tokonyadia_api.repository.CategoryRepository;
 import com.enigma.tokonyadia_api.service.ProductCategoryService;
 import com.enigma.tokonyadia_api.specification.ProductCategorySpecification;
-import com.enigma.tokonyadia_api.utils.SortUtil;
+import com.enigma.tokonyadia_api.util.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

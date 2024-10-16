@@ -13,7 +13,7 @@ import com.enigma.tokonyadia_api.entity.TransactionDetail;
 import com.enigma.tokonyadia_api.repository.TransactionRepository;
 import com.enigma.tokonyadia_api.service.*;
 import com.enigma.tokonyadia_api.specification.TransactionSpecification;
-import com.enigma.tokonyadia_api.utils.SortUtil;
+import com.enigma.tokonyadia_api.util.SortUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getOne(transactionId);
         return transaction.getTransactionDetails().stream()
                 .map(Mapper::toTransactionDetailResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -2,10 +2,11 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.AuthRequest;
+import com.enigma.tokonyadia_api.dto.request.RegisterRequest;
 import com.enigma.tokonyadia_api.dto.response.AuthResponse;
 import com.enigma.tokonyadia_api.dto.response.RegisterResponse;
 import com.enigma.tokonyadia_api.service.AuthService;
-import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import com.enigma.tokonyadia_api.util.ResponseUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AuthRequest request){
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request){
         RegisterResponse registerResponse = authService.register(request);
         return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_REGISTER_USER, registerResponse);
     }

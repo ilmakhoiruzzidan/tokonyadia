@@ -6,7 +6,7 @@ import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import com.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import com.enigma.tokonyadia_api.service.CustomerService;
-import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import com.enigma.tokonyadia_api.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<?> saveCustomer(@RequestBody CustomerCreateRequest request) {
-        CustomerResponse customerResponse = customerService.createCustomer(request);
+        CustomerResponse customerResponse = customerService.create(request);
         return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_CUSTOMER, customerResponse);
     }
 

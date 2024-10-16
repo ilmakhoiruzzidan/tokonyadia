@@ -10,8 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "m_customer")
-public class Customer extends Auditable<String> {
+@Table(name = "m_seller")
+public class Seller extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

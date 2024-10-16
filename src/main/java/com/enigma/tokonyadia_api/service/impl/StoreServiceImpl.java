@@ -9,7 +9,7 @@ import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.StoreRepository;
 import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.specification.StoreSpecification;
-import com.enigma.tokonyadia_api.utils.SortUtil;
+import com.enigma.tokonyadia_api.util.SortUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 @AllArgsConstructor
 @Service
@@ -53,12 +52,7 @@ public class StoreServiceImpl implements StoreService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Store> storeSpecification = StoreSpecification.getSpecification(request);
         Page<Store> storePage = storeRepository.findAll(storeSpecification, pageable);
-        return storePage.map(new Function<Store, StoreResponse>() {
-            @Override
-            public StoreResponse apply(Store store) {
-                return Mapper.toStoreResponse(store);
-            }
-        });
+        return storePage.map(Mapper::toStoreResponse);
     }
 
     @Override
@@ -75,6 +69,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public void deleteStore(String id) {
         Store store = getOne(id);
+        if (store == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_STORE_NOT_FOUND);
         storeRepository.delete(store);
     }
 

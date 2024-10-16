@@ -5,12 +5,15 @@ import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class AuthRequest {
+public class RegisterRequest {
     @NotNull
     private String username;
     @NotNull
     private String password;
+    private String name;
+    private String email;
+    private String phoneNumber;
 }

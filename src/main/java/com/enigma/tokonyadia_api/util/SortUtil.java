@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.utils;
+package com.enigma.tokonyadia_api.util;
 
 import org.springframework.data.domain.Sort;
 

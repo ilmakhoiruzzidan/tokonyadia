@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                 })
                 .authorizeHttpRequests(req ->
                         req.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/customers").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                                 .anyRequest().authenticated()

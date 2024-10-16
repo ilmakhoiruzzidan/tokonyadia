@@ -5,7 +5,7 @@ import com.enigma.tokonyadia_api.dto.request.ProductCategoryRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductCategoryResponse;
 import com.enigma.tokonyadia_api.service.ProductCategoryService;
-import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import com.enigma.tokonyadia_api.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

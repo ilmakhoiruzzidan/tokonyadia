@@ -12,7 +12,7 @@ import com.enigma.tokonyadia_api.service.ProductCategoryService;
 import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.specification.ProductSpecification;
-import com.enigma.tokonyadia_api.utils.SortUtil;
+import com.enigma.tokonyadia_api.util.SortUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

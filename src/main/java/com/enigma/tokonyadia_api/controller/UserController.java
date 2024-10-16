@@ -5,7 +5,7 @@ import com.enigma.tokonyadia_api.dto.request.UserRequest;
 import com.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import com.enigma.tokonyadia_api.dto.response.UserResponse;
 import com.enigma.tokonyadia_api.service.UserService;
-import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import com.enigma.tokonyadia_api.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ public class UserController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_CURRENT_USER_INFO, userResponse);
     }
 
-    @PutMapping("/{id}/update")
+    @PatchMapping("/{id}/update-password")
     public ResponseEntity<?> updatePassword(@PathVariable String id, @RequestBody UserUpdatePasswordRequest request) {
         userService.updatePassword(id, request);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PASSWORD, null);

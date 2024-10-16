@@ -7,6 +7,7 @@ public class Constant {
     public static final String STORE_API = "/api/stores";
     public static final String AUTH_API = "/api/auth";
     public static final String USER_API = "/api/users";
+    public static final String TRANSACTION_API = "/api/transactions";
     public static final String PRODUCTS_CATEGORIES = "/api/products/categories";
 
     public static final String SUCCESS_CREATE_PRODUCT = "Successfully created new product";
@@ -49,6 +50,8 @@ public class Constant {
     public static final String ERROR_USER_NOT_FOUND = "Error user is not found";
     public static final String ERROR_USERNAME_NOT_FOUND = "Error username is not found";
 
+    public static final String ERROR_CUSTOMER_NOT_FOUND = "Data pelanggan tidak ditemukan";
+
     public static final String ERROR_ADD_ITEMS_NON_DRAFT = "Can only add items to draft transaction";
     public static final String ERROR_UPDATE_ITEMS_NON_DRAFT = "Error update items non draft";
     public static final String ERROR_TRANSACTION_DETAIL_NOT_FOUND = "Error transaction detail not found";
@@ -60,6 +63,7 @@ public class Constant {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
     public static final String REFRESH_TOKEN_REQUIRED = "Refresh token is required";
 
+    public static final String ERROR_SELLER_NOT_FOUND = "Error seller is not found";
     public static final String OK = "OK";
 
 }

@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.utils;
+package com.enigma.tokonyadia_api.util;
 
 import com.enigma.tokonyadia_api.dto.response.CommonResponse;
 import com.enigma.tokonyadia_api.dto.response.PagingResponse;

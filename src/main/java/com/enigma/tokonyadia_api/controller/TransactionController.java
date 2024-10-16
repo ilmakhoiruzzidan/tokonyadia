@@ -7,7 +7,7 @@ import com.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
 import com.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.TransactionResponse;
 import com.enigma.tokonyadia_api.service.TransactionService;
-import com.enigma.tokonyadia_api.utils.ResponseUtil;
+import com.enigma.tokonyadia_api.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/transactions")
+@RequestMapping(path = Constant.TRANSACTION_API)
 public class TransactionController {
     private final TransactionService transactionService;
 

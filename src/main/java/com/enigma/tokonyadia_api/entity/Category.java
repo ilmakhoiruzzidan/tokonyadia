@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.entity;
 
+import com.enigma.tokonyadia_api.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "m_category")
-public class Category {
+public class Category extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

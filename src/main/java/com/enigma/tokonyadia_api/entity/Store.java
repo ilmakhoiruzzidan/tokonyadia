@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.entity;
 
+import com.enigma.tokonyadia_api.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "m_store")
-public class Store {
+public class Store extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -31,4 +32,9 @@ public class Store {
 
     @OneToMany(mappedBy = "store")
     private List<Product> product;
+
+    @OneToOne
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
+
 }

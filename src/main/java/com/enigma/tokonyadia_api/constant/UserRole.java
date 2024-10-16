@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum UserRole {
     ROLE_ADMIN("Admin"),
-    ROLE_CASHIER("Kasir"),
+    ROLE_SELLER("Penjual"),
     ROLE_CUSTOMER("Pelanggan");
 
     private final String description;

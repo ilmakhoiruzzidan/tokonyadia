@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.entity;
 
+import com.enigma.tokonyadia_api.audit.Auditable;
 import com.enigma.tokonyadia_api.constant.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserAccount implements UserDetails {
+public class UserAccount extends Auditable<String> implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
