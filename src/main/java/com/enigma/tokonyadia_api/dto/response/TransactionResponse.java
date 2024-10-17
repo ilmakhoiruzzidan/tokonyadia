@@ -20,6 +20,7 @@ public class TransactionResponse {
     private LocalDateTime transactionDate;
     private CustomerResponse customer;
     private List<SimpleTransactionDetailResponse> transactionDetail;
+    private String transactionStatus;
 
     @JsonProperty("transactionDate")
     public String getFormattedTransactionDate() {

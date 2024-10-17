@@ -3,7 +3,9 @@ package com.enigma.tokonyadia_api.service.impl;
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.TransactionStatus;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
-import com.enigma.tokonyadia_api.dto.request.*;
+import com.enigma.tokonyadia_api.dto.request.DraftTransactionRequest;
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
+import com.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
 import com.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.TransactionResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
@@ -14,6 +16,7 @@ import com.enigma.tokonyadia_api.repository.TransactionRepository;
 import com.enigma.tokonyadia_api.service.*;
 import com.enigma.tokonyadia_api.specification.TransactionSpecification;
 import com.enigma.tokonyadia_api.util.SortUtil;
+import com.enigma.tokonyadia_api.util.ValidationUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,12 +30,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
+    private final ValidationUtil validationUtil;
     private final TransactionRepository transactionRepository;
     private final TransactionDetailService transactionDetailService;
     private final StoreService storeService;
@@ -42,6 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse createDraft(DraftTransactionRequest request) {
+        validationUtil.validate(request);
         Customer customer = customerService.getOne(request.getCustomerId());
         Transaction transaction = Transaction.builder()
                 .customer(customer)
@@ -50,6 +53,16 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
         Transaction savedTransaction = transactionRepository.saveAndFlush(transaction);
         return Mapper.toTransactionResponse(savedTransaction);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<TransactionResponse> getAllTransactions(PagingAndSortingRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Transaction> transactionSpecification = TransactionSpecification.getSpecification(request);
+        Page<Transaction> transactionPage = transactionRepository.findAll(transactionSpecification, pageable);
+        return transactionPage.map(Mapper::toTransactionResponse);
     }
 
     @Transactional(readOnly = true)
@@ -64,41 +77,42 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse addTransactionDetail(String transactionId, TransactionDetailRequest request) {
+        validationUtil.validate(request);
         Transaction transaction = getOne(transactionId);
+
         if (transaction.getStatus() != TransactionStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_NON_DRAFT);
         }
+
         Product product = productService.getOne(request.getProductId());
+        if (product.getStock() < request.getQty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_INSUFFICIENT_STOCK);
 
-        Optional<TransactionDetail> existingTransactionDetail = transaction.getTransactionDetails().stream()
-                .filter(transactionDetail -> transactionDetail.getProduct().getId().equalsIgnoreCase(product.getId()))
-                .findFirst();
-
-        if (existingTransactionDetail.isPresent()) {
-            TransactionDetail transactionDetail = existingTransactionDetail.get();
-            transactionDetail.setQty(transactionDetail.getQty() + request.getQty());
-            transactionDetail.setPrice(product.getPrice());
+        boolean isExist = false;
+        for (TransactionDetail transactionDetail : transaction.getTransactionDetails()) {
+            if (transactionDetail.getProduct().getId().equalsIgnoreCase(product.getId())) {
+                if (transactionDetail.getQty() + request.getQty() > product.getStock()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_INSUFFICIENT_STOCK);
+                }
+                transactionDetail.setQty(transactionDetail.getQty() + request.getQty());
+                transactionDetail.setPrice(product.getPrice());
+                isExist = true;
+                break;
+            }
         }
 
-        TransactionDetail.builder()
-                .product(product)
-                .transaction(transaction)
-                .qty(request.getQty())
-                .price(product.getPrice())
-                .build();
+        if (!isExist) {
+            TransactionDetail transactionDetail = TransactionDetail.builder()
+                    .product(product)
+                    .transaction(transaction)
+                    .qty(request.getQty())
+                    .price(product.getPrice())
+                    .build();
+            transaction.getTransactionDetails().add(transactionDetail);
+        }
 
-        Transaction updateTransaction = transactionRepository.save(transaction);
-        return Mapper.toTransactionResponse(updateTransaction);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<TransactionResponse> getAllTransactions(PagingAndSortingRequest request) {
-        Sort sortBy = SortUtil.parseSort(request.getSortBy());
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
-        Specification<Transaction> transactionSpecification = TransactionSpecification.getSpecification(request);
-        Page<Transaction> transactionPage = transactionRepository.findAll(transactionSpecification, pageable);
-        return transactionPage.map(Mapper::toTransactionResponse);
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+        return Mapper.toTransactionResponse(updatedTransaction);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -121,6 +135,25 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction updatedTransaction = transactionRepository.save(transaction);
         return Mapper.toTransactionResponse(updatedTransaction);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public TransactionResponse checkoutTransaction(String transactionId) {
+        Transaction transaction = getOne(transactionId);
+        if (transaction.getStatus() != TransactionStatus.DRAFT)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_CHECKOUT_ITEM_FROM_NON_DRAFT);
+
+        transaction.setStatus(TransactionStatus.PENDING);
+        for (TransactionDetail transactionDetail : transaction.getTransactionDetails()) {
+            Product product = transactionDetail.getProduct();
+            product.setStock(product.getStock() - transactionDetail.getQty());
+            productService.updateProduct(product);
+        }
+
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+        return Mapper.toTransactionResponse(updatedTransaction);
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override

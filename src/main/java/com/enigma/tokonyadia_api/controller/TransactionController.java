@@ -41,6 +41,23 @@ public class TransactionController {
         return ResponseUtil.buildResponse(HttpStatus.OK, "Successfully add transaction details", transactionResponse);
     }
 
+    @PutMapping("/{transactionId}/details/{detailsId}")
+    public ResponseEntity<?> updateTransactionDetail(@PathVariable String transactionId, @PathVariable String detailsId, @Valid @RequestBody TransactionDetailRequest transactionDetailRequest) {
+        TransactionResponse transactionResponse = transactionService.updateTransactionDetails(transactionId, detailsId, transactionDetailRequest);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_TRANSACTION, transactionResponse);
+    }
+
+    @PostMapping("/{transactionId}/checkout")
+    public ResponseEntity<?> checkoutTransaction(@PathVariable String transactionId) {
+        TransactionResponse transactionResponse = transactionService.checkoutTransaction(transactionId);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_TRANSACTION, transactionResponse);
+    }
+
+    @DeleteMapping("/{transactionId}/details/{detailsId}")
+    public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId, @PathVariable String detailsId) {
+        transactionService.deleteTransactionDetails(transactionId, detailsId);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAIL, null);
+    }
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
@@ -53,24 +70,12 @@ public class TransactionController {
                 .sortBy(sortBy)
                 .build();
         Page<TransactionResponse> transactionPage = transactionService.getAllTransactions(pagingAndSortingRequest);
-        return ResponseUtil.buildResponsePagination(HttpStatus.OK, "OK", transactionPage);
+        return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_TRANSACTION, transactionPage);
     }
 
     @GetMapping("/{transactionId}")
     public ResponseEntity<?> getTransactionById(@PathVariable String transactionId) {
         TransactionResponse transactionResponse = transactionService.getTransactionById(transactionId);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_TRANSACTION_BY_ID, transactionResponse);
-    }
-
-    @PutMapping("/{transactionId}/details/{detailsId}")
-    public ResponseEntity<?> updateTransactionDetail(@PathVariable String transactionId, @PathVariable String detailsId, @Valid @RequestBody TransactionDetailRequest transactionDetailRequest) {
-        TransactionResponse transactionResponse = transactionService.updateTransactionDetails(transactionId, detailsId, transactionDetailRequest);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_TRANSACTION, transactionResponse);
-    }
-
-    @DeleteMapping("/{transactionId}/details/{detailsId}")
-    public ResponseEntity<?> deleteTransactionById(@PathVariable String transactionId, @PathVariable String detailsId) {
-        transactionService.deleteTransactionDetails(transactionId, detailsId);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAIL, null);
     }
 }

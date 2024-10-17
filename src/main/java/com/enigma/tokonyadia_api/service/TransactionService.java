@@ -18,5 +18,6 @@ public interface TransactionService {
     Page<TransactionResponse> getAllTransactions(PagingAndSortingRequest request);
     TransactionResponse addTransactionDetail(String transactionId, TransactionDetailRequest request);
     TransactionResponse updateTransactionDetails(String transactionId, String detailsId, TransactionDetailRequest request);
+    TransactionResponse checkoutTransaction(String transactionId);
     TransactionResponse deleteTransactionDetails(String transactionId, String detailsId);
 }
