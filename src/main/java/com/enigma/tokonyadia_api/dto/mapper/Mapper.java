@@ -51,6 +51,7 @@ public class Mapper {
                 .transactionId(transaction.getId())
                 .transactionDate(transaction.getTransDate())
                 .customer(customerResponse)
+                .transactionStatus(transaction.getStatus().name())
                 .transactionDetail(transactionDetailResponses)
                 .build();
     }
@@ -99,6 +100,24 @@ public class Mapper {
                 .id(category.getId())
                 .name(category.getName())
                 .description(category.getDescription())
+                .build();
+    }
+
+    public static CustomerResponse toCustomerResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .phoneNumber(customer.getPhoneNumber())
+                .email(customer.getEmail())
+                .build();
+    }
+
+    public static SellerResponse toSellerResponse(Seller seller) {
+        return SellerResponse.builder()
+                .id(seller.getId())
+                .name(seller.getName())
+                .phoneNumber(seller.getPhoneNumber())
+                .email(seller.getEmail())
                 .build();
     }
 }

@@ -5,17 +5,15 @@ import com.enigma.tokonyadia_api.constant.UserRole;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.AuthRequest;
 import com.enigma.tokonyadia_api.dto.request.RegisterRequest;
-import com.enigma.tokonyadia_api.dto.request.UserRequest;
 import com.enigma.tokonyadia_api.dto.response.AuthResponse;
 import com.enigma.tokonyadia_api.dto.response.RegisterResponse;
-import com.enigma.tokonyadia_api.dto.response.UserResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
+import com.enigma.tokonyadia_api.entity.Seller;
 import com.enigma.tokonyadia_api.entity.UserAccount;
 import com.enigma.tokonyadia_api.repository.UserAccountRepository;
 import com.enigma.tokonyadia_api.service.*;
 import com.enigma.tokonyadia_api.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserService userService;
     private final CustomerService customerService;
+    private final SellerService sellerService;
     private final UserAccountRepository userAccountRepository;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
@@ -42,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(readOnly = true)
     @Override
     public AuthResponse login(AuthRequest request) {
-//        validationUtil.validate(request);
+        validationUtil.validate(request);
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -61,27 +60,43 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse register(RegisterRequest request) {
         try {
             validationUtil.validate(request);
-            UserAccount userAccount = UserAccount.builder()
-                    .username(request.getUsername())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .role(UserRole.ROLE_CUSTOMER)
-                    .build();
-
-            userService.create(userAccount);
-
-            Customer customer = Customer.builder()
-                    .name(request.getName())
-                    .email(request.getEmail())
-                    .phoneNumber(request.getPhoneNumber())
-                    .userAccount(userAccount)
-                    .build();
-
-            customerService.create(customer);
-
-            return Mapper.toRegisterResponse(userAccount);
+            if (request.getRole().equalsIgnoreCase("ADMIN")) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ROLE_NOT_FOUND);
+            } else if (request.getRole().equalsIgnoreCase("PELANGGAN")) {
+                UserAccount userAccount = UserAccount.builder()
+                        .username(request.getUsername())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .role(UserRole.ROLE_CUSTOMER)
+                        .build();
+                userService.create(userAccount);
+                Customer customer = Customer.builder()
+                        .name(request.getName())
+                        .email(request.getEmail())
+                        .phoneNumber(request.getPhoneNumber())
+                        .userAccount(userAccount)
+                        .build();
+                customerService.create(customer);
+                return Mapper.toRegisterResponse(userAccount);
+            } else if (request.getRole().equalsIgnoreCase("PENJUAL")) {
+                UserAccount userAccount = UserAccount.builder()
+                        .username(request.getUsername())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .role(UserRole.ROLE_SELLER)
+                        .build();
+                userService.create(userAccount);
+                Seller seller = Seller.builder()
+                        .name(request.getName())
+                        .email(request.getEmail())
+                        .phoneNumber(request.getPhoneNumber())
+                        .userAccount(userAccount)
+                        .build();
+                sellerService.create(seller);
+                return Mapper.toRegisterResponse(userAccount);
+            }
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_USERNAME_DUPLICATE);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ROLE_NOT_FOUND);
     }
 
     @Override

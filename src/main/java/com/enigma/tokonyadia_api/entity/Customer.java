@@ -26,7 +26,7 @@ public class Customer extends Auditable<String> {
     private String phoneNumber;
 
     @OneToOne
-    @JoinColumn(name = "user_account_id")
+    @JoinColumn(name = "user_account_id", nullable = false)
     private UserAccount userAccount;
 
 }

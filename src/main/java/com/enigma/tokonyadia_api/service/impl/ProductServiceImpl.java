@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.service.impl;
 
+import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
@@ -50,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getOne(String productId) {
         return productRepository.findById(productId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PRODUCT_NOT_FOUND)
         );
     }
 
@@ -76,6 +77,11 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setPrice(request.getPrice());
         productRepository.save(newProduct);
         return Mapper.toProductResponse(newProduct);
+    }
+
+    @Override
+    public Product updateProduct(Product product) {
+        return productRepository.save(product);
     }
 
     @Override
