@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class SellerController {
     private final SellerService sellerService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> create(SellerCreateRequest request) {
         SellerResponse sellerResponse = sellerService.create(request);
@@ -56,6 +57,7 @@ public class SellerController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_SELLER, sellerResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSeller(@PathVariable String id) {
         sellerService.deleteSeller(id);

@@ -21,12 +21,14 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> saveCustomer(@RequestBody CustomerCreateRequest request) {
         CustomerResponse customerResponse = customerService.create(request);
         return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_CUSTOMER, customerResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
@@ -57,6 +59,7 @@ public class CustomerController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_CUSTOMER, customerResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCustomerById(@PathVariable String id) {
         customerService.deleteCustomer(id);

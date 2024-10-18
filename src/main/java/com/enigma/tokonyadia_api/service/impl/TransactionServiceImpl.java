@@ -36,8 +36,6 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
     private final ValidationUtil validationUtil;
     private final TransactionRepository transactionRepository;
-    private final TransactionDetailService transactionDetailService;
-    private final StoreService storeService;
     private final ProductService productService;
     private final CustomerService customerService;
 
@@ -162,6 +160,9 @@ public class TransactionServiceImpl implements TransactionService {
         if (transaction.getStatus() != TransactionStatus.DRAFT)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_REMOVE_ITEMS_FROM_NON_DRAFT);
 
+        transaction.getTransactionDetails().stream().findFirst().orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction detail is empty")
+        );
         transaction.getTransactionDetails().removeIf(details -> details.getId().equals(detailsId));
         Transaction updatedTransaction = transactionRepository.save(transaction);
         return Mapper.toTransactionResponse(updatedTransaction);

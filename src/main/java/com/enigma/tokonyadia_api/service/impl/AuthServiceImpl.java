@@ -31,7 +31,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final CustomerService customerService;
     private final SellerService sellerService;
-    private final UserAccountRepository userAccountRepository;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     private final ValidationUtil validationUtil;

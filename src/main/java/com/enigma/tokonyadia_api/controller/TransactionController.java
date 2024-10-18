@@ -58,6 +58,7 @@ public class TransactionController {
         transactionService.deleteTransactionDetails(transactionId, detailsId);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_TRANSACTION_DETAIL, null);
     }
+
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,

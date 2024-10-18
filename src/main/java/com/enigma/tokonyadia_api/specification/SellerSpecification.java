@@ -10,23 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SellerSpecification {
-    public static Specification<Seller> getSpecification(SearchSellerRequest request){
+    public static Specification<Seller> getSpecification(SearchSellerRequest request) {
         return (root, query, criteriaBuilder) -> {
-            if (request.getQuery() == null) return criteriaBuilder.conjunction();
+            if (request.getQuery() == null || request.getQuery().isEmpty() || request.getQuery().isBlank())
+                return criteriaBuilder.conjunction();
 
-            List<Predicate> predicateList = new ArrayList<>();
-            if (!StringUtils.hasText(request.getQuery())) {
+            List<Predicate> predicates = new ArrayList<>();
+            if (!StringUtils.hasText(request.getQuery()) || request.getQuery() != null) {
                 Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");
-                predicateList.add(predicate);
+                predicates.add(predicate);
             }
 
-            if (request.getQuery() != null) {
-                Predicate predicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getQuery() + "%");
-                predicateList.add(predicate);
-            }
-
-            if (predicateList.isEmpty()) return criteriaBuilder.conjunction();
-            return query.where(predicateList.toArray(new Predicate[]{})).getRestriction();
+            if (predicates.isEmpty()) return criteriaBuilder.conjunction();
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
     }
 }
