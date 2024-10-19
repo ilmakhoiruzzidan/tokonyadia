@@ -16,7 +16,7 @@ public class SearchProductRequest extends PagingAndSortingRequest {
     private String query;
     private Long minPrice;
     private Long maxPrice;
-    private StoreResponse store;
+    private String store;
     private String categoryId;
     private String categoryName;
 }

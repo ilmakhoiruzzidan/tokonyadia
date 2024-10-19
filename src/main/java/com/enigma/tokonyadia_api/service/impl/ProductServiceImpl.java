@@ -5,6 +5,8 @@ import com.enigma.tokonyadia_api.dto.mapper.Mapper;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
+import com.enigma.tokonyadia_api.dto.response.SimpleProductResponse;
+import com.enigma.tokonyadia_api.dto.response.StoreProductResponse;
 import com.enigma.tokonyadia_api.entity.Category;
 import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.entity.Store;
@@ -15,15 +17,17 @@ import com.enigma.tokonyadia_api.service.StoreService;
 import com.enigma.tokonyadia_api.specification.ProductSpecification;
 import com.enigma.tokonyadia_api.util.SortUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -71,6 +75,48 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<?> getAllProductByStore(SearchProductRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Product> productSpecification = ProductSpecification.getSpecification(request);
+        Page<Product> productPage = productRepository.findAll(productSpecification, pageable);
+        List<StoreProductResponse> newStoreProductResponses = new ArrayList<>();
+
+        if (productPage.isEmpty()) {
+            log.warn("No products found");
+            return new PageImpl<>(newStoreProductResponses, pageable, productPage.getTotalElements());
+        }
+
+        for (Product product : productPage.getContent()) {
+            StoreProductResponse storeResponse = newStoreProductResponses.stream()
+                    .filter(s -> s.getStoreId().equals(product.getStore().getId()))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        StoreProductResponse storeProductResponse = StoreProductResponse.builder()
+                                .storeId(product.getStore().getId())
+                                .storeName(product.getStore().getName())
+                                .categoryName(product.getCategory().getName())
+                                .products(new ArrayList<>())
+                                .build();
+                        newStoreProductResponses.add(storeProductResponse);
+                        return storeProductResponse;
+                    });
+
+            SimpleProductResponse simpleProductResponse = SimpleProductResponse.builder()
+                    .productName(product.getName())
+                    .stock(product.getStock())
+                    .price(product.getPrice())
+                    .categoryName(product.getCategory().getName())
+                    .storeName(product.getStore().getName())
+                    .build();
+
+            storeResponse.getProducts().add(simpleProductResponse);
+        }
+        return new PageImpl<>(newStoreProductResponses, pageable, productPage.getTotalElements());
+    }
+
+
+    @Override
     public ProductResponse updateProduct(ProductRequest request, String id) {
         Product newProduct = getOne(id);
         newProduct.setName(request.getName());
@@ -88,7 +134,6 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(String id) {
         Product product = getOne(id);
         productRepository.delete(product);
-
     }
 
 }
