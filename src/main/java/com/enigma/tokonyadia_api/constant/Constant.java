@@ -9,7 +9,8 @@ public class Constant {
     public static final String USER_API = "/api/users";
     public static final String PRODUCTS_CATEGORIES = "/api/products/categories";
     public static final String SELLER_API = "/api/seller";
-    public static final String TRANSACTION_API = "/api/transactions";
+    public static final String ORDER_API = "/api/orders";
+    public static final String PAYMENT_API ="/api/payments";
 
     public static final String SUCCESS_CREATE_PRODUCT = "Successfully created new product";
     public static final String SUCCESS_GET_ALL_PRODUCT = "Successfully retrieved all products";
@@ -29,12 +30,16 @@ public class Constant {
     public static final String SUCCESS_GET_CUSTOMER_BY_ID = "Successfully retrieve customer by id";
     public static final String SUCCESS_DELETE_CUSTOMER = "Successfully delete customer";
 
-    public static final String SUCCESS_GET_TRANSACTION_BY_ID = "Successfully retrieve transaction";
-    public static final String SUCCESS_GET_ALL_TRANSACTION = "Successfully retrieved all transaction";
-    public static final String SUCCESS_UPDATE_TRANSACTION = "Successfully update transaction";
-    public static final String SUCCESS_REMOVE_TRANSACTION_DETAIL = "Successfully remove transaction details";
-    public static final String SUCCESS_GET_TRANSACTION_DETAIL = "Successfully retrieve transaction detail";
-    public static final String SUCCESS_CHECKOUT_TRANSACTION = "Successfully checkout transaction";
+    public static final String SUCCESS_GET_ORDER_BY_ID = "Successfully retrieve order";
+    public static final String SUCCESS_GET_ALL_ORDER = "Successfully retrieved all order";
+    public static final String SUCCESS_UPDATE_ORDER = "Successfully update order";
+    public static final String SUCCESS_REMOVE_ORDER_DETAIL = "Successfully remove order details";
+    public static final String SUCCESS_GET_ORDER_DETAIL = "Successfully retrieve order detail";
+    public static final String SUCCESS_CHECKOUT_ORDER = "Successfully checkout order";
+    public static final String SUCCESS_ADD_ITEMS_TO_ORDER = "Successfully add items to order";
+
+    public static final String ERROR_ORDER_NOT_FOUND = "Error order Not Found";
+    public static final String ERROR_ORDER_DETAIL_NOT_FOUND = "Error order detail not found";
 
     public static final String SUCCESS_REGISTER_USER = "Successfully register user";
     public static final String SUCCESS_GET_CURRENT_USER_INFO = "Successfully retrieve current user info";
@@ -49,7 +54,6 @@ public class Constant {
     public static final String ERROR_CATEGORY_NOT_FOUND = "Error category is not found";
     public static final String ERROR_STORE_NOT_FOUND = "Error store is not found";
 
-    public static final String ERROR_TRANSACTION_NOT_FOUND = "Error transaction Not Found";
     public static final String ERROR_CREATE_JWT = "Error creating JWT";
     public static final String ERROR_USERNAME_DUPLICATE = "Error username is already exist";
 
@@ -60,9 +64,8 @@ public class Constant {
 
     public static final String ERROR_CUSTOMER_NOT_FOUND = "Error customer is not found";
 
-    public static final String ERROR_ADD_ITEMS_NON_DRAFT = "Can only add items to draft transaction";
+    public static final String ERROR_ADD_ITEMS_NON_DRAFT = "Can only add items to draft order";
     public static final String ERROR_UPDATE_ITEMS_NON_DRAFT = "Error update items non draft";
-    public static final String ERROR_TRANSACTION_DETAIL_NOT_FOUND = "Error transaction detail not found";
     public static final String ERROR_REMOVE_ITEMS_FROM_NON_DRAFT = "Error remove items from items non draft";
     public static final String ERROR_CHECKOUT_ITEM_FROM_NON_DRAFT = "Error checkout items non draft";
     public static final String ERROR_INSUFFICIENT_STOCK = "Error insufficient stock";
@@ -74,8 +77,10 @@ public class Constant {
     public static final String REFRESH_TOKEN_REQUIRED = "Refresh token is required";
     public static final String SUCCESS_REFRESH_TOKEN = "Successfully refresh token generated";
 
-
     public static final String ERROR_SELLER_NOT_FOUND = "Error seller is not found";
+
+    public static final String ERROR_PAYMENT_NOT_FOUND = "Error payment order not found";
+
     public static final String OK = "OK";
     public static final String SYSTEM = "SYSTEM";
 

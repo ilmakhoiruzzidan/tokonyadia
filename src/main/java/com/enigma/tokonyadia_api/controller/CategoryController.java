@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = Constant.PRODUCTS_CATEGORIES)
 @RequiredArgsConstructor
-public class ProductCategoryController {
+public class CategoryController {
     private final ProductCategoryService productCategoryService;
 
     @GetMapping

@@ -2,7 +2,7 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.UserRole;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import com.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .userAccount(userAccount)
                 .build();
         customerRepository.saveAndFlush(customer);
-        return Mapper.toCustomerResponse(customer);
+        return MapperUtil.toCustomerResponse(customer);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse getCustomerById(String id) {
         Customer customer = getOne(id);
-        return Mapper.toCustomerResponse(customer);
+        return MapperUtil.toCustomerResponse(customer);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Customer> customerSpecification = CustomerSpecification.getSpecification(request);
         Page<Customer> customerPage = customerRepository.findAll(customerSpecification, pageable);
-        return customerPage.map(Mapper::toCustomerResponse);
+        return customerPage.map(MapperUtil::toCustomerResponse);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
         newCustomer.setEmail(request.getEmail());
         newCustomer.setPhoneNumber(request.getPhoneNumber());
         customerRepository.save(newCustomer);
-        return Mapper.toCustomerResponse(newCustomer);
+        return MapperUtil.toCustomerResponse(newCustomer);
     }
 
     @Override

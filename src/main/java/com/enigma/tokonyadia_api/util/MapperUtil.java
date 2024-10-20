@@ -1,11 +1,11 @@
-package com.enigma.tokonyadia_api.dto.mapper;
+package com.enigma.tokonyadia_api.util;
 
 import com.enigma.tokonyadia_api.dto.response.*;
 import com.enigma.tokonyadia_api.entity.*;
 
 import java.util.List;
 
-public class Mapper {
+public class MapperUtil {
 
     public static ProductResponse toProductResponse(Product product) {
         return ProductResponse.builder()
@@ -29,53 +29,57 @@ public class Mapper {
                 .build();
     }
 
-    public static TransactionResponse toTransactionResponse(Transaction transaction) {
+    public static OrderResponse toOrderResponse(Order order) {
 
-        CustomerResponse customerResponse = CustomerResponse.builder()
-                .id(transaction.getCustomer().getId())
-                .name(transaction.getCustomer().getName())
-                .email(transaction.getCustomer().getEmail())
-                .phoneNumber(transaction.getCustomer().getPhoneNumber())
+        SimpleCustomerResponse customerResponse = SimpleCustomerResponse.builder()
+                .id(order.getCustomer().getId())
+                .name(order.getCustomer().getName())
                 .build();
 
-        List<SimpleTransactionDetailResponse> transactionDetailResponses = transaction.getTransactionDetails().stream()
-                .map(transactionDetail -> SimpleTransactionDetailResponse.builder()
-                        .id(transactionDetail.getId())
-                        .product(Mapper.toProductResponse(transactionDetail.getProduct()))
-                        .qty(transactionDetail.getQty())
-                        .price(transactionDetail.getPrice())
+        List<SimpleOrderDetailResponse> orderDetailResponses = order.getOrderDetails().stream()
+                .map(orderDetail -> SimpleOrderDetailResponse.builder()
+                        .id(orderDetail.getId())
+                        .product(SimpleProductResponse.builder()
+                                .productName(orderDetail.getProduct().getName())
+                                .stock(orderDetail.getProduct().getStock())
+                                .price(orderDetail.getProduct().getPrice())
+                                .categoryName(orderDetail.getProduct().getCategory().getName())
+                                .storeName(orderDetail.getProduct().getStore().getName())
+                                .build())
+                        .qty(orderDetail.getQty())
+                        .price(orderDetail.getPrice())
                         .build())
                 .toList();
 
-        return TransactionResponse.builder()
-                .transactionId(transaction.getId())
-                .transactionDate(transaction.getTransDate())
+        return OrderResponse.builder()
+                .orderId(order.getId())
+                .transactionDate(order.getTransDate())
                 .customer(customerResponse)
-                .transactionStatus(transaction.getStatus().name())
-                .transactionDetail(transactionDetailResponses)
+                .transactionStatus(order.getOrderStatus().name())
+                .orderDetail(orderDetailResponses)
                 .build();
     }
 
-    public static TransactionDetailResponse toTransactionDetailResponse(TransactionDetail transactionDetail) {
-        Transaction transaction = Transaction.builder()
-                .id(transactionDetail.getTransaction().getId())
-                .transDate(transactionDetail.getTransaction().getTransDate())
-                .customer(transactionDetail.getTransaction().getCustomer())
+    public static OrderDetailResponse toOrderDetailResponse(OrderDetail orderDetail) {
+        Order order = Order.builder()
+                .id(orderDetail.getOrder().getId())
+                .transDate(orderDetail.getOrder().getTransDate())
+                .customer(orderDetail.getOrder().getCustomer())
                 .build();
 
         Product product = Product.builder()
-                .id(transactionDetail.getProduct().getId())
-                .name(transactionDetail.getProduct().getName())
-                .description(transactionDetail.getProduct().getDescription())
-                .store(transactionDetail.getProduct().getStore())
-                .stock(transactionDetail.getProduct().getStock())
+                .id(orderDetail.getProduct().getId())
+                .name(orderDetail.getProduct().getName())
+                .description(orderDetail.getProduct().getDescription())
+                .store(orderDetail.getProduct().getStore())
+                .stock(orderDetail.getProduct().getStock())
                 .build();
 
-        return TransactionDetailResponse.builder()
-                .id(transactionDetail.getId())
-                .qty(transactionDetail.getQty())
-                .transaction(Mapper.toTransactionResponse(transaction))
-                .product(Mapper.toProductResponse(product))
+        return OrderDetailResponse.builder()
+                .id(orderDetail.getId())
+                .qty(orderDetail.getQty())
+                .order(MapperUtil.toOrderResponse(order))
+                .product(MapperUtil.toProductResponse(product))
                 .build();
     }
 
@@ -118,6 +122,16 @@ public class Mapper {
                 .name(seller.getName())
                 .phoneNumber(seller.getPhoneNumber())
                 .email(seller.getEmail())
+                .build();
+    }
+
+    public static PaymentResponse toPaymentResponse(Payment payment) {
+        return PaymentResponse.builder()
+                .orderId(payment.getOrder().getId())
+                .amount(payment.getAmount())
+                .paymentStatus(payment.getPaymentStatus())
+                .tokenSnap(payment.getTokenSnap())
+                .redirectUrl(payment.getRedirectUrl())
                 .build();
     }
 }

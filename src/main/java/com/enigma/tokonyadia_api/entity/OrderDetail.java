@@ -8,9 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "t_transaction_detail")
+@Table(name = "t_order_detail")
 @Builder
-public class TransactionDetail {
+public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,7 +18,7 @@ public class TransactionDetail {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
-    private Transaction transaction;
+    private Order order;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn

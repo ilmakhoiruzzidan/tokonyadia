@@ -14,11 +14,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Builder
-public class TransactionResponse {
-    private String transactionId;
+public class OrderResponse {
+    private String orderId;
     private LocalDateTime transactionDate;
-    private CustomerResponse customer;
-    private List<SimpleTransactionDetailResponse> transactionDetail;
+    private SimpleCustomerResponse customer;
+    private List<SimpleOrderDetailResponse> orderDetail;
     private String transactionStatus;
 
     @JsonProperty("transactionDate")

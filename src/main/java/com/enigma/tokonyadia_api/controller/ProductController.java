@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     public final ProductService productService;
 
+
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
         ProductResponse productResponse = productService.createProduct(request);
@@ -56,6 +57,29 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody ProductRequest request) {
         ProductResponse productResponse = productService.updateProduct(request, id);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
+    }
+
+    @GetMapping("/stores")
+    public ResponseEntity<?> getProductByStores(
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "maxPrice", required = false) Long maxPrice,
+            @RequestParam(name = "minPrice", required = false) Long minPrice,
+            @RequestParam(name = "q", required = false) String query,
+            @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "store", required = false) String store
+    ){
+        SearchProductRequest searchProductRequest = SearchProductRequest.builder()
+                .page(page)
+                .size(size)
+                .maxPrice(maxPrice)
+                .minPrice(minPrice)
+                .query(query)
+                .sortBy(sortBy)
+                .store(store)
+                .build();
+        Page<?> productResponses = productService.getAllProductByStore(searchProductRequest);
+        return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_PRODUCT, productResponses);
     }
 
     @DeleteMapping("/{id}")

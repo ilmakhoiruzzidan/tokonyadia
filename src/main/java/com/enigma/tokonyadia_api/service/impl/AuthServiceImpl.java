@@ -2,7 +2,7 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.UserRole;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.AuthRequest;
 import com.enigma.tokonyadia_api.dto.request.RegisterRequest;
 import com.enigma.tokonyadia_api.dto.response.AuthResponse;
@@ -10,7 +10,6 @@ import com.enigma.tokonyadia_api.dto.response.RegisterResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
 import com.enigma.tokonyadia_api.entity.Seller;
 import com.enigma.tokonyadia_api.entity.UserAccount;
-import com.enigma.tokonyadia_api.repository.UserAccountRepository;
 import com.enigma.tokonyadia_api.service.*;
 import com.enigma.tokonyadia_api.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
                         .userAccount(userAccount)
                         .build();
                 customerService.create(customer);
-                return Mapper.toRegisterResponse(userAccount);
+                return MapperUtil.toRegisterResponse(userAccount);
             } else if (request.getRole().equalsIgnoreCase("PENJUAL")) {
                 UserAccount userAccount = UserAccount.builder()
                         .username(request.getUsername())
@@ -90,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
                         .userAccount(userAccount)
                         .build();
                 sellerService.create(seller);
-                return Mapper.toRegisterResponse(userAccount);
+                return MapperUtil.toRegisterResponse(userAccount);
             }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

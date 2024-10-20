@@ -2,7 +2,7 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.UserRole;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.UserRequest;
 import com.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import com.enigma.tokonyadia_api.dto.response.UserResponse;
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             // save userAccount
             userAccountRepository.save(userAccount);
-            return Mapper.toUserResponse(userAccount);
+            return MapperUtil.toUserResponse(userAccount);
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_USERNAME_DUPLICATE);
         }
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
-        return Mapper.toUserResponse(userAccount);
+        return MapperUtil.toUserResponse(userAccount);
     }
 
     @Transactional(rollbackFor = Exception.class)

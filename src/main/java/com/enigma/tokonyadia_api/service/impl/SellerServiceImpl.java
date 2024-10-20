@@ -2,7 +2,7 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.UserRole;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.SearchSellerRequest;
 import com.enigma.tokonyadia_api.dto.request.SellerCreateRequest;
 import com.enigma.tokonyadia_api.dto.request.SellerRequest;
@@ -51,7 +51,7 @@ public class SellerServiceImpl implements SellerService {
                 .userAccount(userAccount)
                 .build();
         sellerRepository.saveAndFlush(seller);
-        return Mapper.toSellerResponse(seller);
+        return MapperUtil.toSellerResponse(seller);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class SellerServiceImpl implements SellerService {
     @Override
     public SellerResponse getSellerById(String id) {
         Seller seller = getOne(id);
-        return Mapper.toSellerResponse(seller);
+        return MapperUtil.toSellerResponse(seller);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SellerServiceImpl implements SellerService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Seller> customerSpecification = SellerSpecification.getSpecification(request);
         Page<Seller> customerPage = sellerRepository.findAll(customerSpecification, pageable);
-        return customerPage.map(Mapper::toSellerResponse);
+        return customerPage.map(MapperUtil::toSellerResponse);
 
     }
 
@@ -82,7 +82,7 @@ public class SellerServiceImpl implements SellerService {
         newSeller.setEmail(request.getEmail());
         newSeller.setPhoneNumber(request.getPhoneNumber());
         sellerRepository.save(newSeller);
-        return Mapper.toSellerResponse(newSeller);
+        return MapperUtil.toSellerResponse(newSeller);
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransactionRequest {
+public class OrderRequest {
     private String customerId;
-    private List<TransactionDetailRequest> transactionDetail;
+    private List<OrderDetailRequest> orderDetail;
 }

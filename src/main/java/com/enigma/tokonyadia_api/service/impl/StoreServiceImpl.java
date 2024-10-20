@@ -1,7 +1,7 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.SearchStoreRequest;
 import com.enigma.tokonyadia_api.dto.request.StoreRequest;
 import com.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -37,13 +37,13 @@ public class StoreServiceImpl implements StoreService {
                 .phoneNumber(request.getPhoneNumber())
                 .build();
         storeRepository.saveAndFlush(store);
-        return Mapper.toStoreResponse(store);
+        return MapperUtil.toStoreResponse(store);
     }
 
     @Override
     public StoreResponse getStoreById(String id) {
         Store store = getOne(id);
-        return Mapper.toStoreResponse(store);
+        return MapperUtil.toStoreResponse(store);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class StoreServiceImpl implements StoreService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Store> storeSpecification = StoreSpecification.getSpecification(request);
         Page<Store> storePage = storeRepository.findAll(storeSpecification, pageable);
-        return storePage.map(Mapper::toStoreResponse);
+        return storePage.map(MapperUtil::toStoreResponse);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class StoreServiceImpl implements StoreService {
         newStore.setAddress(request.getAddress());
         newStore.setPhoneNumber(request.getPhoneNumber());
         storeRepository.save(newStore);
-        return Mapper.toStoreResponse(newStore);
+        return MapperUtil.toStoreResponse(newStore);
     }
 
     @Override

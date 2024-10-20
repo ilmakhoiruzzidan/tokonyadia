@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DraftTransactionRequest {
+public class DraftOrderRequest {
     @NotBlank
     private String customerId;
 }

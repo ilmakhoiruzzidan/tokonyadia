@@ -13,6 +13,15 @@ public enum PaymentStatus {
     EXPIRE("expire");
 
     private final String description;
+
+    public static PaymentStatus findByDesc(String description){
+        for (PaymentStatus value : values()) {
+            if (value.description.equalsIgnoreCase(description)){
+                return value;
+            }
+        }
+        return null;
+    }
 }
 
 

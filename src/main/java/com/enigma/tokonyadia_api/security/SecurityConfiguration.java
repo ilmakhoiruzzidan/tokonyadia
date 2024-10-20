@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.security;
 
+import com.enigma.tokonyadia_api.constant.Constant;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/customers").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/payments/notifications").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

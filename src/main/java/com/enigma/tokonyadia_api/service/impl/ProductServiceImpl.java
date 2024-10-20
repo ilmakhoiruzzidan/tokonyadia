@@ -1,7 +1,7 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
 import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductCategoryService productCategoryService;
     private final ProductRepository productRepository;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse createProduct(ProductRequest request) {
         Store store = storeService.getOne(request.getStoreId());
@@ -49,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(category)
                 .build();
         productRepository.saveAndFlush(product);
-        return Mapper.toProductResponse(product);
+        return MapperUtil.toProductResponse(product);
     }
 
     @Override
@@ -59,21 +61,24 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductResponse getProductById(String id) {
         Product product = getOne(id);
-        return Mapper.toProductResponse(product);
+        return MapperUtil.toProductResponse(product);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getAllProducts(SearchProductRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Product> productSpecification = ProductSpecification.getSpecification(request);
         Page<Product> productPage = productRepository.findAll(productSpecification, pageable);
-        return productPage.map(Mapper::toProductResponse);
+        return productPage.map(MapperUtil::toProductResponse);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<?> getAllProductByStore(SearchProductRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
@@ -115,21 +120,23 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(newStoreProductResponses, pageable, productPage.getTotalElements());
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse updateProduct(ProductRequest request, String id) {
         Product newProduct = getOne(id);
         newProduct.setName(request.getName());
         newProduct.setPrice(request.getPrice());
         productRepository.save(newProduct);
-        return Mapper.toProductResponse(newProduct);
+        return MapperUtil.toProductResponse(newProduct);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Product updateProduct(Product product) {
         return productRepository.save(product);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProduct(String id) {
         Product product = getOne(id);

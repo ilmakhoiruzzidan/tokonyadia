@@ -1,7 +1,7 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.dto.mapper.Mapper;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.ProductCategoryRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductCategoryResponse;
@@ -32,7 +32,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 .description(request.getDescription())
                 .build();
         categoryRepository.save(category);
-        return Mapper.toCategoryResponse(category);
+        return MapperUtil.toCategoryResponse(category);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Category> categorySpecification = ProductCategorySpecification.getSpecification(request);
         Page<Category> categoryPage = categoryRepository.findAll(categorySpecification, pageable);
-        return categoryPage.map(Mapper::toCategoryResponse);
+        return categoryPage.map(MapperUtil::toCategoryResponse);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         Category category = getOne(id);
         category.setName(request.getName());
         category.setDescription(request.getDescription());
-        return Mapper.toCategoryResponse(category);
+        return MapperUtil.toCategoryResponse(category);
     }
 
     @Override

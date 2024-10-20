@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class PaymentRequest {
-    private String transactionId;
+    private String orderId;
 }

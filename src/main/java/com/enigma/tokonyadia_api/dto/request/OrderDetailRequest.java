@@ -10,11 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransactionDetailRequest {
+public class OrderDetailRequest {
     @NotBlank
     private String productId;
     @NotNull
     @PositiveOrZero
     private Integer qty;
-
 }

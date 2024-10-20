@@ -1,6 +1,6 @@
 package com.enigma.tokonyadia_api.entity;
 
-import com.enigma.tokonyadia_api.constant.TransactionStatus;
+import com.enigma.tokonyadia_api.constant.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "t_transaction")
-public class Transaction {
+@Table(name = "t_order")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -29,10 +29,10 @@ public class Transaction {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+    private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TransactionDetail> transactionDetails;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails;
 
     @PrePersist
     protected void PrePersist() {
