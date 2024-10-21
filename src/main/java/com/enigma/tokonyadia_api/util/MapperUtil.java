@@ -1,8 +1,10 @@
 package com.enigma.tokonyadia_api.util;
 
+import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.response.*;
 import com.enigma.tokonyadia_api.entity.*;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MapperUtil {
@@ -12,6 +14,7 @@ public class MapperUtil {
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
+                .images(getProductImages(product))
                 .store(toStoreResponse(product.getStore()))
                 .category(toCategoryResponse(product.getCategory()))
                 .description(product.getDescription())
@@ -43,6 +46,7 @@ public class MapperUtil {
                                 .productName(orderDetail.getProduct().getName())
                                 .stock(orderDetail.getProduct().getStock())
                                 .price(orderDetail.getProduct().getPrice())
+                                .images(getProductImages(orderDetail.getProduct()))
                                 .categoryName(orderDetail.getProduct().getCategory().getName())
                                 .storeName(orderDetail.getProduct().getStore().getName())
                                 .build())
@@ -133,5 +137,14 @@ public class MapperUtil {
                 .tokenSnap(payment.getTokenSnap())
                 .redirectUrl(payment.getRedirectUrl())
                 .build();
+    }
+
+    public static List<FileResponse> getProductImages(Product product) {
+        return product.getImages() != null && !product.getImages().isEmpty() ?
+                product.getImages().stream().map(file -> FileResponse.builder()
+                        .id(file.getId())
+                        .url(Constant.IMAGE_API + "/" + file.getId())
+                        .build()).toList() :
+                Collections.emptyList();
     }
 }

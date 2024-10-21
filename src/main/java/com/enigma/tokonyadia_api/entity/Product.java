@@ -38,10 +38,6 @@ public class Product extends Auditable<String> {
     private Store store;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private Seller seller;
-
-    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 

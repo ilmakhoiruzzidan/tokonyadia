@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Table(name = "m_file")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

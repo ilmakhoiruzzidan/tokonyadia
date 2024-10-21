@@ -50,7 +50,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     public ProductImage update(String imageId, MultipartFile multipartFile) {
         ProductImage productImage = findByIdOrThrowNotFound(imageId);
         FileInfo fileInfo = fileStorageService.storeFile(FileType.IMAGE, PRODUCT, multipartFile, contentTypes);
-        fileStorageService.deleteFile(productImage.getFilename());
+        fileStorageService.deleteFile(productImage.getPath());
         productImage.setPath(fileInfo.getPath());
         return productImageRepository.saveAndFlush(productImage);
     }
@@ -68,7 +68,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     @Override
     public FileDownloadResponse downloadImage(String imageId) {
         ProductImage productImage = findByIdOrThrowNotFound(imageId);
-        Resource resource = fileStorageService.readFile(productImage.getFilename());
+        Resource resource = fileStorageService.readFile(productImage.getPath());
         return FileDownloadResponse.builder()
                 .resource(resource)
                 .contentType(productImage.getContentType())

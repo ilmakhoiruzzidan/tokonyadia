@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.security;
+package com.enigma.tokonyadia_api.audit;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.entity.UserAccount;
@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Optional;
 
 @Slf4j
-public class SecurityAuditorAware implements AuditorAware<String> {
+public class AuditorAwareImpl implements AuditorAware<String> {
     @NotNull
     @Override
     public Optional<String> getCurrentAuditor() {

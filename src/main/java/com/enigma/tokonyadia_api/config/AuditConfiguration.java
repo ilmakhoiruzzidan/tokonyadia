@@ -1,6 +1,6 @@
 package com.enigma.tokonyadia_api.config;
 
-import com.enigma.tokonyadia_api.security.SecurityAuditorAware;
+import com.enigma.tokonyadia_api.audit.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -11,6 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class AuditConfiguration {
     @Bean
     public AuditorAware<String> auditorProvider(){
-        return new SecurityAuditorAware();
+        return new AuditorAwareImpl();
     }
 }

@@ -13,5 +13,4 @@ public class StoreProductResponse {
     private String storeId;
     private String storeName;
     private List<SimpleProductResponse> products;
-    private String categoryName;
 }

@@ -2,6 +2,8 @@ package com.enigma.tokonyadia_api.dto.response;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -10,6 +12,7 @@ import lombok.*;
 public class SimpleProductResponse {
     private String productName;
     private Integer stock;
+    private List<FileResponse> images;
     private Long price;
     private String categoryName;
     private String storeName;

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -20,8 +21,9 @@ public class StoreController {
 
     public final StoreService storeService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PostMapping
-    public ResponseEntity<?> saveStore(@RequestBody StoreRequest request) {
+    public ResponseEntity<?> createStore(@RequestBody StoreRequest request) {
         StoreResponse storeResponse = storeService.createStore(request);
         return ResponseUtil.buildResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_STORE, storeResponse);
     }
@@ -49,12 +51,14 @@ public class StoreController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_GET_STORE_BY_ID, storeResponse);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStore(@RequestBody StoreRequest request, @PathVariable String id) {
         StoreResponse storeResponse = storeService.updateStore(request, id);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_STORE, storeResponse);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStore(@PathVariable String id) {
         storeService.deleteStore(id);

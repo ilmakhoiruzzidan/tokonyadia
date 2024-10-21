@@ -101,7 +101,7 @@ public class ProductController {
         Page<?> productResponses = productService.getAllProductByStore(searchProductRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_PRODUCT, productResponses);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PatchMapping(path = "/images/{id}")
     public ResponseEntity<?> updateSpecifiedImageById(
             @PathVariable String id,
@@ -111,7 +111,7 @@ public class ProductController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT_IMAGE, productResponse);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @DeleteMapping(path = "/images/{id}")
     public ResponseEntity<?> deleteSpecifiedImageById(@PathVariable String id) {
         productService.deleteImage(id);

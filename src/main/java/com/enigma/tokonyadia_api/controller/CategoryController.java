@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = Constant.PRODUCTS_CATEGORIES)
+@RequestMapping(path = Constant.PRODUCT_CATEGORIES_API)
 @RequiredArgsConstructor
 public class CategoryController {
     private final ProductCategoryService productCategoryService;

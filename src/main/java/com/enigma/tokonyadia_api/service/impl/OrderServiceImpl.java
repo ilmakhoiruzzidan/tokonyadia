@@ -123,7 +123,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse updateOrderDetails(String orderId, String detailsId, OrderDetailRequest request) {
         Order order = getOne(orderId);
-        // TODO : Update transactionDetail
         if (order.getOrderStatus() != OrderStatus.DRAFT)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_UPDATE_ITEMS_NON_DRAFT);
 
@@ -145,7 +144,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
         validationUtil.validate(request);
         Order order = getOne(orderId);
-        if (request.getStatus().equals(OrderStatus.CONFIRMED)){
+        if (request.getStatus().equals(OrderStatus.CONFIRMED)) {
             for (OrderDetail orderDetail : order.getOrderDetails()) {
                 Product product = orderDetail.getProduct();
                 Integer quantity = orderDetail.getQty();
@@ -160,24 +159,6 @@ public class OrderServiceImpl implements OrderService {
         return MapperUtil.toOrderResponse(updatedOrder);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public OrderResponse checkoutOrder(String orderId) {
-        Order order = getOne(orderId);
-        if (order.getOrderStatus() != OrderStatus.DRAFT)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_CHECKOUT_ITEM_FROM_NON_DRAFT);
-
-        order.setOrderStatus(OrderStatus.PENDING);
-        for (OrderDetail orderDetail : order.getOrderDetails()) {
-            Product product = orderDetail.getProduct();
-            product.setStock(product.getStock() - orderDetail.getQty());
-            productService.updateProductAndImage(product);
-        }
-
-        Order updatedOrder = orderRepository.save(order);
-        return MapperUtil.toOrderResponse(updatedOrder);
-    }
-
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -187,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_REMOVE_ITEMS_FROM_NON_DRAFT);
 
         order.getOrderDetails().stream().findFirst().orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction detail is empty")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ORDER_DETAIL_NOT_FOUND)
         );
         order.getOrderDetails().removeIf(details -> details.getId().equals(detailsId));
         Order updatedOrder = orderRepository.save(order);

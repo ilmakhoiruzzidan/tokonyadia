@@ -15,5 +15,4 @@ public class ProductRequest{
     private Integer stock;
     private String categoryId;
     private String storeId;
-    private String sellerId;
 }

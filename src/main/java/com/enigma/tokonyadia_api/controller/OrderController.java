@@ -4,6 +4,7 @@ import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.dto.request.DraftOrderRequest;
 import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
+import com.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
 import com.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.OrderResponse;
 import com.enigma.tokonyadia_api.service.OrderService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,16 +49,17 @@ public class OrderController {
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_ORDER, orderResponse);
     }
 
-    @PostMapping("/{orderId}/checkout")
-    public ResponseEntity<?> checkoutOrder(@PathVariable String orderId) {
-        OrderResponse orderResponse = orderService.checkoutOrder(orderId);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
-    }
-
     @DeleteMapping("/{orderId}/details/{detailsId}")
     public ResponseEntity<?> deleteOrderById(@PathVariable String orderId, @PathVariable String detailsId) {
         orderService.deleteOrderDetails(orderId, detailsId);
         return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_REMOVE_ORDER_DETAIL, null);
+    }
+
+    @PatchMapping("/{orderId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @RequestBody UpdateOrderStatusRequest request) {
+        OrderResponse orderResponse = orderService.updateOrderStatus(orderId, request);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_ORDER_STATUS, orderResponse);
     }
 
     @GetMapping

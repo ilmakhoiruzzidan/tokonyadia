@@ -1,7 +1,8 @@
 package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
-import com.enigma.tokonyadia_api.entity.ProductImage;
+import com.enigma.tokonyadia_api.constant.UserRole;
+import com.enigma.tokonyadia_api.entity.*;
 import com.enigma.tokonyadia_api.service.ProductImageService;
 import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.ProductRequest;
@@ -9,9 +10,6 @@ import com.enigma.tokonyadia_api.dto.request.SearchProductRequest;
 import com.enigma.tokonyadia_api.dto.response.ProductResponse;
 import com.enigma.tokonyadia_api.dto.response.SimpleProductResponse;
 import com.enigma.tokonyadia_api.dto.response.StoreProductResponse;
-import com.enigma.tokonyadia_api.entity.Category;
-import com.enigma.tokonyadia_api.entity.Product;
-import com.enigma.tokonyadia_api.entity.Store;
 import com.enigma.tokonyadia_api.repository.ProductRepository;
 import com.enigma.tokonyadia_api.service.ProductCategoryService;
 import com.enigma.tokonyadia_api.service.ProductService;
@@ -24,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -111,7 +111,6 @@ public class ProductServiceImpl implements ProductService {
                         StoreProductResponse storeProductResponse = StoreProductResponse.builder()
                                 .storeId(product.getStore().getId())
                                 .storeName(product.getStore().getName())
-                                .categoryName(product.getCategory().getName())
                                 .products(new ArrayList<>())
                                 .build();
                         newStoreProductResponses.add(storeProductResponse);
@@ -122,6 +121,7 @@ public class ProductServiceImpl implements ProductService {
                     .productName(product.getName())
                     .stock(product.getStock())
                     .price(product.getPrice())
+                    .images(MapperUtil.getProductImages(product))
                     .categoryName(product.getCategory().getName())
                     .storeName(product.getStore().getName())
                     .build();
