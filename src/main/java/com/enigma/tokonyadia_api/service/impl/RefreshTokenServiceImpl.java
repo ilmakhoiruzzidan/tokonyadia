@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    @Value("${warung.makan.bahari.refresh-token-expiration-in-hour}")
+    @Value("${tokonyadia.refresh-token-expiration-in-hour}")
     private Integer REFRESH_TOKEN_EXPIRY;
 
     private final RedisService redisService;

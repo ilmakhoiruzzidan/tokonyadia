@@ -40,4 +40,10 @@ public class Payment {
 
     @Column(name = "redirect_url")
     private String redirectUrl;
+
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastModifiedDate = LocalDateTime.now();
+    }
 }

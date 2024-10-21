@@ -1,8 +1,9 @@
 package com.enigma.tokonyadia_api.service;
 
+import com.enigma.tokonyadia_api.constant.OrderStatus;
 import com.enigma.tokonyadia_api.dto.request.DraftOrderRequest;
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
 import com.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.OrderResponse;
@@ -27,6 +28,9 @@ public interface OrderService {
     OrderResponse updateOrderDetails(String orderId, String detailsId, OrderDetailRequest request);
 
     OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request);
+
+    void updateOrderStatus(String orderId, OrderStatus orderStatus);
+    void updateStock(Order order, OrderStatus orderStatus);
 
     OrderResponse deleteOrderDetails(String orderId, String detailsId);
 }

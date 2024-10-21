@@ -144,7 +144,15 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
         validationUtil.validate(request);
         Order order = getOne(orderId);
-        if (request.getStatus().equals(OrderStatus.CONFIRMED)) {
+        order.setOrderStatus(request.getStatus());
+        Order updatedOrder = orderRepository.save(order);
+        return MapperUtil.toOrderResponse(updatedOrder);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateStock(Order order, OrderStatus orderStatus){
+        if (OrderStatus.CONFIRMED.equals(orderStatus)) {
             for (OrderDetail orderDetail : order.getOrderDetails()) {
                 Product product = orderDetail.getProduct();
                 Integer quantity = orderDetail.getQty();
@@ -154,9 +162,15 @@ public class OrderServiceImpl implements OrderService {
                 productService.updateProductAndImage(product);
             }
         }
-        order.setOrderStatus(request.getStatus());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateOrderStatus(String orderId, OrderStatus orderStatus) {
+        Order order = getOne(orderId);
+        order.setOrderStatus(orderStatus);
         Order updatedOrder = orderRepository.save(order);
-        return MapperUtil.toOrderResponse(updatedOrder);
+        MapperUtil.toOrderResponse(updatedOrder);
     }
 
 

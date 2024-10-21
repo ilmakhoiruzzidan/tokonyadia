@@ -3,6 +3,7 @@ package com.enigma.tokonyadia_api.controller;
 
 import com.enigma.tokonyadia_api.util.ResponseUtil;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -11,17 +12,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorController {
 
     @ExceptionHandler({ResponseStatusException.class})
     public ResponseEntity<?> handlingResponseStatusException(ResponseStatusException e) {
+        log.error("Exception ResponseStatusException : {}", e.getReason());
         HttpStatusCode statusCode = e.getStatusCode();
         return ResponseUtil.buildResponse(HttpStatus.valueOf(statusCode.value()), e.getReason(), null);
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ResponseEntity<?> handlingDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.error("Exception DataIntegrityViolationException : {}", e.getMessage());
         String message = "";
         HttpStatus status = HttpStatus.CONFLICT;
 
@@ -48,6 +52,7 @@ public class ErrorController {
 
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<?> handlingConstraintViolationException(ConstraintViolationException e) {
+        log.error("Exception ConstraintViolationException : {}", e.getMessage());
         return ResponseUtil.buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
     }
 
