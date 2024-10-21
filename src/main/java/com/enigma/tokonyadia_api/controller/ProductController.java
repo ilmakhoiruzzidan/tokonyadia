@@ -101,6 +101,15 @@ public class ProductController {
         Page<?> productResponses = productService.getAllProductByStore(searchProductRequest);
         return ResponseUtil.buildResponsePagination(HttpStatus.OK, Constant.SUCCESS_GET_ALL_PRODUCT, productResponses);
     }
+    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
+    @PatchMapping(path = "/images/{id}")
+    public ResponseEntity<?> updateSpecifiedImageById(
+            @PathVariable String id,
+            @RequestParam(name = "image") MultipartFile file
+    ) {
+        ProductResponse productResponse = productService.updateImage(file, id);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_SPECIFY_PRODUCT_IMAGE, productResponse);
+    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @DeleteMapping("/{id}")
