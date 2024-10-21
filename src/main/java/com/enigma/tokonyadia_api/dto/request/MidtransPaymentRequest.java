@@ -15,5 +15,8 @@ public class MidtransPaymentRequest {
 
     @JsonProperty(value = "enabled_payments")
     private List<String> enabledPayments;
+
+    @JsonProperty(value = "expiry")
+    private MidtransExpiryRequest expiry;
 }
 

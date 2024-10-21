@@ -71,7 +71,7 @@ public class Constant {
     public static final String ERROR_INSUFFICIENT_STOCK = "Error insufficient stock";
 
     public static final String SUCCESS_UPDATE_PASSWORD = "Successfully updated password";
-    public static final String INVALID_CREDENTIAL = "Invalid credential";
+    public static final String ERROR_INVALID_CREDENTIAL = "Invalid credential";
     public static final String ERROR_INVALID_JWT_TOKEN = "Invalid JWT token. Please provide a valid token.";
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
     public static final String REFRESH_TOKEN_REQUIRED = "Refresh token is required";
@@ -79,7 +79,16 @@ public class Constant {
 
     public static final String ERROR_SELLER_NOT_FOUND = "Error seller is not found";
 
+    public static final String ERROR_SAVE_IMAGE = "Error while save image";
+    public static final String ERROR_IMAGE_NOT_FOUND = "Error image not found";
+    public static final String ERROR_IMAGE_CANNOT_BE_EMPTY  = "image cannot be empty";
+    public static final String ERROR_FILENAME_CANNOT_BE_EMPTY = "filename cannot be empty";
+    public static final String ERROR_FILE_LIMIT = "file size exceed limit";
+    public static final String ERROR_INVALID_FILE_EXTENSION = "invalid extensions type";
+    public static final String ERROR_WHILE_INIT_DIRECTORY = "Error while init directory";
+
     public static final String ERROR_PAYMENT_NOT_FOUND = "Error payment order not found";
+    public static final String ERROR_INVALID_SIGNATURE_KEY_MIDTRANS = "invalid signature key";
 
     public static final String OK = "OK";
     public static final String SYSTEM = "SYSTEM";

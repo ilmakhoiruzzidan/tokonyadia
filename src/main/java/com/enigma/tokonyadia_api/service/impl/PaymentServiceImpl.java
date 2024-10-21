@@ -10,11 +10,10 @@ import com.enigma.tokonyadia_api.dto.response.PaymentResponse;
 import com.enigma.tokonyadia_api.entity.Order;
 import com.enigma.tokonyadia_api.entity.OrderDetail;
 import com.enigma.tokonyadia_api.entity.Payment;
-import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.repository.PaymentRepository;
 import com.enigma.tokonyadia_api.service.OrderService;
 import com.enigma.tokonyadia_api.service.PaymentService;
-import com.enigma.tokonyadia_api.service.ProductService;
+import com.enigma.tokonyadia_api.util.DateUtil;
 import com.enigma.tokonyadia_api.util.HashUtil;
 import com.enigma.tokonyadia_api.util.MapperUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.List;
 
@@ -36,7 +36,6 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderService orderService;
-    private final ProductService productService;
     private final MidtransClient midtransClient;
 
     @Value("${midtrans.server.key}")
@@ -55,11 +54,14 @@ public class PaymentServiceImpl implements PaymentService {
             Integer quantity = orderDetail.getQty();
             Long price = orderDetail.getPrice();
             amount += quantity * price;
-
-            Product product = orderDetail.getProduct();
-            product.setStock(product.getStock() - quantity);
-            productService.updateProduct(product);
         }
+
+        int duration = 7;
+        MidtransExpiryRequest expireRequest = MidtransExpiryRequest.builder()
+                .startTime(DateUtil.zonedDateTimeToString(ZonedDateTime.now()))
+                .unit("minute")
+                .duration(duration)
+                .build();
 
         MidtransTransactionRequest midtransTransactionRequest = MidtransTransactionRequest.builder()
                 .orderId(order.getId())
@@ -69,6 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
         MidtransPaymentRequest midtransPaymentRequest = MidtransPaymentRequest.builder()
                 .transactionDetail(midtransTransactionRequest)
                 .enabledPayments(List.of("bca_va", "gopay", "shopeepay", "other_qris"))
+                .expiry(expireRequest)
                 .build();
 
         String headerValue = "Basic " + Base64.getEncoder().encodeToString(MIDTRANS_SERVER_KEY.getBytes(StandardCharsets.UTF_8));
@@ -98,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Start getNotification: {}", System.currentTimeMillis());
         if (!validateSignatureKey(request)) {
             log.error("Invalid signature key for order: {}", request.getOrderId());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid signature key");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, Constant.ERROR_INVALID_SIGNATURE_KEY_MIDTRANS);
         }
 
         Payment payment = paymentRepository.findByOrder_Id(request.getOrderId())

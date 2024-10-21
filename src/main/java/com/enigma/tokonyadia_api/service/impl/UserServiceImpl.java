@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
         UserAccount userAccount = getById(id);
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), userAccount.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.INVALID_CREDENTIAL);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_INVALID_CREDENTIAL);
         }
 
         userAccount.setPassword(passwordEncoder.encode(request.getNewPassword()));

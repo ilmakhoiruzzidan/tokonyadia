@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.bean;
+package com.enigma.tokonyadia_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

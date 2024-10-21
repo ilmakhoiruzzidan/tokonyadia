@@ -1,4 +1,4 @@
-package com.enigma.tokonyadia_api.bean;
+package com.enigma.tokonyadia_api.config;
 
 import com.enigma.tokonyadia_api.security.SecurityAuditorAware;
 import org.springframework.context.annotation.Bean;

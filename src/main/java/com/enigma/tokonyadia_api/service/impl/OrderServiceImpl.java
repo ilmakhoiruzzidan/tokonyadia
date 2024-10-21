@@ -2,20 +2,22 @@ package com.enigma.tokonyadia_api.service.impl;
 
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.OrderStatus;
-import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.dto.request.DraftOrderRequest;
-import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
+import com.enigma.tokonyadia_api.dto.request.PagingAndSortingRequest;
 import com.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
 import com.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import com.enigma.tokonyadia_api.dto.response.OrderResponse;
 import com.enigma.tokonyadia_api.entity.Customer;
-import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.entity.Order;
 import com.enigma.tokonyadia_api.entity.OrderDetail;
+import com.enigma.tokonyadia_api.entity.Product;
 import com.enigma.tokonyadia_api.repository.OrderRepository;
-import com.enigma.tokonyadia_api.service.*;
+import com.enigma.tokonyadia_api.service.CustomerService;
+import com.enigma.tokonyadia_api.service.OrderService;
+import com.enigma.tokonyadia_api.service.ProductService;
 import com.enigma.tokonyadia_api.specification.OrderSpecification;
+import com.enigma.tokonyadia_api.util.MapperUtil;
 import com.enigma.tokonyadia_api.util.SortUtil;
 import com.enigma.tokonyadia_api.util.ValidationUtil;
 import lombok.AllArgsConstructor;
@@ -143,6 +145,16 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
         validationUtil.validate(request);
         Order order = getOne(orderId);
+        if (request.getStatus().equals(OrderStatus.CONFIRMED)){
+            for (OrderDetail orderDetail : order.getOrderDetails()) {
+                Product product = orderDetail.getProduct();
+                Integer quantity = orderDetail.getQty();
+                if (product.getStock() < quantity)
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_INSUFFICIENT_STOCK);
+                product.setStock(product.getStock() - quantity);
+                productService.updateProductAndImage(product);
+            }
+        }
         order.setOrderStatus(request.getStatus());
         Order updatedOrder = orderRepository.save(order);
         return MapperUtil.toOrderResponse(updatedOrder);
@@ -159,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             Product product = orderDetail.getProduct();
             product.setStock(product.getStock() - orderDetail.getQty());
-            productService.updateProduct(product);
+            productService.updateProductAndImage(product);
         }
 
         Order updatedOrder = orderRepository.save(order);
