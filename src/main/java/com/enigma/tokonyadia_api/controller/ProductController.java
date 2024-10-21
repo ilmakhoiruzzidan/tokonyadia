@@ -108,7 +108,14 @@ public class ProductController {
             @RequestParam(name = "image") MultipartFile file
     ) {
         ProductResponse productResponse = productService.updateImage(file, id);
-        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_SPECIFY_PRODUCT_IMAGE, productResponse);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT_IMAGE, productResponse);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'CASHIER')")
+    @DeleteMapping(path = "/images/{id}")
+    public ResponseEntity<?> deleteSpecifiedImageById(@PathVariable String id) {
+        productService.deleteImage(id);
+        return ResponseUtil.buildResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PRODUCT_IMAGE, null);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")

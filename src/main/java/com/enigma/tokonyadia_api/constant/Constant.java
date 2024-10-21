@@ -79,7 +79,8 @@ public class Constant {
 
     public static final String ERROR_SELLER_NOT_FOUND = "Error seller is not found";
 
-    public static final String SUCCESS_UPDATE_SPECIFY_PRODUCT_IMAGE = "Successfully updated product image";
+    public static final String SUCCESS_DELETE_PRODUCT_IMAGE = "Successfully deleted product image";
+    public static final String SUCCESS_UPDATE_PRODUCT_IMAGE = "Successfully updated product image";
     public static final String ERROR_SAVE_IMAGE = "Error while save image";
     public static final String ERROR_IMAGE_NOT_FOUND = "Error image not found";
     public static final String ERROR_IMAGE_CANNOT_BE_EMPTY  = "image cannot be empty";

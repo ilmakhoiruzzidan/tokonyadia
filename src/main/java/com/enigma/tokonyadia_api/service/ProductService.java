@@ -19,6 +19,7 @@ public interface ProductService {
     Page<?> getAllProductByStore(SearchProductRequest request);
 
     void deleteProduct(String id);
+    void deleteImage(String imageId);
 
     ProductResponse updateProductAndImage(List<MultipartFile> multipartFiles, ProductRequest request, String id);
     ProductResponse updateImage(MultipartFile file, String imageId);

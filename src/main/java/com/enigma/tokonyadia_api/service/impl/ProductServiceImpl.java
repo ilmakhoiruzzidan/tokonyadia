@@ -170,4 +170,10 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteImage(String imageId) {
+        productImageService.deleteById(imageId);
+    }
+
 }
