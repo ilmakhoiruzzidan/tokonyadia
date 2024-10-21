@@ -4,6 +4,8 @@ import com.enigma.tokonyadia_api.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
@@ -16,7 +18,7 @@ public class Product extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name", nullable = false,length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
     @Column(name = "price", nullable = false, columnDefinition = "bigint check(price > 0)")
@@ -27,6 +29,9 @@ public class Product extends Auditable<String> {
 
     @Column(name = "stock", nullable = false, columnDefinition = "int check(stock > 0)")
     private Integer stock;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductImage> images;
 
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
@@ -39,4 +44,6 @@ public class Product extends Auditable<String> {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+
 }
