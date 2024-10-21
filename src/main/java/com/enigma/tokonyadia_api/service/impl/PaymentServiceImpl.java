@@ -1,14 +1,15 @@
 package com.enigma.tokonyadia_api.service.impl;
 
-import com.enigma.tokonyadia_api.client.MidtransClient;
+import com.enigma.tokonyadia_api.client.MidtransApiClient;
+import com.enigma.tokonyadia_api.client.MidtransAppClient;
 import com.enigma.tokonyadia_api.constant.Constant;
 import com.enigma.tokonyadia_api.constant.OrderStatus;
 import com.enigma.tokonyadia_api.constant.PaymentStatus;
 import com.enigma.tokonyadia_api.dto.request.*;
 import com.enigma.tokonyadia_api.dto.response.MidtransSnapResponse;
+import com.enigma.tokonyadia_api.dto.response.MidtransTransactionResponse;
 import com.enigma.tokonyadia_api.dto.response.PaymentResponse;
 import com.enigma.tokonyadia_api.entity.Order;
-import com.enigma.tokonyadia_api.entity.OrderDetail;
 import com.enigma.tokonyadia_api.entity.Payment;
 import com.enigma.tokonyadia_api.repository.PaymentRepository;
 import com.enigma.tokonyadia_api.service.OrderService;
@@ -36,7 +37,8 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderService orderService;
-    private final MidtransClient midtransClient;
+    private final MidtransAppClient midtransAppClient;
+    private final MidtransApiClient midtransApiClient;
 
     @Value("${midtrans.server.key}")
     private String MIDTRANS_SERVER_KEY;
@@ -44,39 +46,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PaymentResponse createPayment(PaymentRequest request) {
-        Order order = orderService.getOne(request.getOrderId());
-
-        if (!order.getOrderStatus().equals(OrderStatus.DRAFT))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_CHECKOUT_ITEM_FROM_NON_DRAFT);
-
-        long amount = 0L;
-        for (OrderDetail orderDetail : order.getOrderDetails()) {
-            Integer quantity = orderDetail.getQty();
-            Long price = orderDetail.getPrice();
-            amount += quantity * price;
-        }
-
-        int duration = 7;
-        MidtransExpiryRequest expireRequest = MidtransExpiryRequest.builder()
-                .startTime(DateUtil.zonedDateTimeToString(ZonedDateTime.now()))
-                .unit("minute")
-                .duration(duration)
-                .build();
-
-        MidtransTransactionRequest midtransTransactionRequest = MidtransTransactionRequest.builder()
-                .orderId(order.getId())
-                .grossAmount(amount)
-                .build();
-
-        MidtransPaymentRequest midtransPaymentRequest = MidtransPaymentRequest.builder()
-                .transactionDetail(midtransTransactionRequest)
-                .enabledPayments(List.of("bca_va", "gopay", "shopeepay", "other_qris"))
-                .expiry(expireRequest)
-                .build();
-
-        String headerValue = "Basic " + Base64.getEncoder().encodeToString(MIDTRANS_SERVER_KEY.getBytes(StandardCharsets.UTF_8));
-        MidtransSnapResponse snapTransaction = midtransClient.createSnapTransaction(midtransPaymentRequest, headerValue);
-
+        Order order = validateOrderForPayment(request.getOrderId());
+        long amount = calculateOrderAmount(order);
+        MidtransSnapResponse snapTransaction = initiateMidtransPayment(order, amount);
         Payment payment = Payment.builder()
                 .order(order)
                 .amount(amount)
@@ -86,55 +58,109 @@ public class PaymentServiceImpl implements PaymentService {
                 .redirectUrl(snapTransaction.getRedirectUrl())
                 .build();
         paymentRepository.saveAndFlush(payment);
+        orderService.updateOrderStatus(order.getId(), OrderStatus.PENDING);
+        return MapperUtil.toPaymentResponse(payment);
+    }
 
-        UpdateOrderStatusRequest updateOrderStatusRequest = UpdateOrderStatusRequest.builder()
-                .status(OrderStatus.PENDING)
+    private long calculateOrderAmount(Order order) {
+        return order.getOrderDetails().stream()
+                .mapToLong(detail -> detail.getQty() * detail.getPrice())
+                .sum();
+    }
+
+    private MidtransSnapResponse initiateMidtransPayment(Order order, long amount) {
+        List<MidtransItemDetailRequest> itemDetails = order.getOrderDetails().stream().map(orderDetail -> MidtransItemDetailRequest.builder()
+                .id(orderDetail.getProduct().getId())
+                .name(orderDetail.getProduct().getName())
+                .category(orderDetail.getProduct().getCategory().getName())
+                .price(orderDetail.getPrice())
+                .quantity(orderDetail.getQty())
+                .build()).toList();
+
+        MidtransCustomerDetailsRequest customerDetailsRequest = MidtransCustomerDetailsRequest.builder()
+                .firstName(order.getCustomer().getName())
+                .email(order.getCustomer().getEmail())
+                .phone(order.getCustomer().getPhoneNumber())
                 .build();
 
-        orderService.updateOrderStatus(order.getId(), updateOrderStatusRequest);
-        return MapperUtil.toPaymentResponse(payment);
+        int duration = 10;
+        MidtransExpiryRequest expireRequest = MidtransExpiryRequest.builder()
+                .startTime(DateUtil.zonedDateTimeToString(ZonedDateTime.now()))
+                .unit("minute")
+                .duration(duration)
+                .build();
+
+        MidtransPaymentRequest midtransPaymentRequest = MidtransPaymentRequest.builder()
+                .transactionDetail(MidtransTransactionRequest.builder()
+                        .orderId(order.getId())
+                        .grossAmount(amount)
+                        .build())
+                .enabledPayments(List.of("bca_va", "gopay", "shopeepay", "other_qris"))
+                .itemDetails(itemDetails)
+                .customerDetails(customerDetailsRequest)
+                .expiry(expireRequest)
+                .build();
+        String headerValue = "Basic " + Base64.getEncoder().encodeToString(MIDTRANS_SERVER_KEY.getBytes(StandardCharsets.UTF_8));
+        return midtransAppClient.createSnapTransaction(midtransPaymentRequest, headerValue);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void getNotification(MidtransNotificationRequest request) {
         log.info("Start getNotification: {}", System.currentTimeMillis());
-        if (!validateSignatureKey(request)) {
-            log.error("Invalid signature key for order: {}", request.getOrderId());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, Constant.ERROR_INVALID_SIGNATURE_KEY_MIDTRANS);
-        }
-
-        Payment payment = paymentRepository.findByOrder_Id(request.getOrderId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PAYMENT_NOT_FOUND));
-
-        PaymentStatus newPaymentStatus = PaymentStatus.findByDesc(request.getTransactionStatus());
-        log.info("Payment status for order {}: {}", request.getOrderId(), newPaymentStatus);
-        payment.setPaymentStatus(newPaymentStatus);
-        payment.setLastModifiedDate(LocalDateTime.now());
-
-        Order order = orderService.getOne(request.getOrderId());
-
-        if (newPaymentStatus != null && newPaymentStatus.equals(PaymentStatus.SETTLEMENT)) {
-            order.setOrderStatus(OrderStatus.CONFIRMED);
-        }
-        log.info("Payment status after update for order {}: {}", request.getOrderId(), newPaymentStatus);
-
-        UpdateOrderStatusRequest updateOrderStatusRequest = UpdateOrderStatusRequest.builder()
-                .status(order.getOrderStatus())
-                .build();
-        orderService.updateOrderStatus(order.getId(), updateOrderStatusRequest);
-        paymentRepository.saveAndFlush(payment);
+        validateSignatureKey(request.getOrderId(), request.getStatusCode(), request.getGrossAmount(), request.getSignatureKey());
+        updatePaymentStatus(request.getOrderId(), request.getTransactionStatus());
         log.info("End getNotification: {}", System.currentTimeMillis());
     }
 
-    private boolean validateSignatureKey(MidtransNotificationRequest request) {
-        String rawString = request.getOrderId() + request.getStatusCode() + request.getGrossAmount() + MIDTRANS_SERVER_KEY;
-        log.info("Order ID: {}", request.getOrderId());
-        log.info("Status Code: {}", request.getStatusCode());
-        log.info("Gross Amount: {}", request.getGrossAmount());
-        log.info("Raw String for signature: {}", rawString);
-        String signatureKey = HashUtil.encryptThisString(rawString);
-        return request.getSignatureKey().equalsIgnoreCase(signatureKey);
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public PaymentResponse getPaymentStatusByOrderId(String orderId) {
+        String headerValue = "Basic " + Base64.getEncoder().encodeToString(MIDTRANS_SERVER_KEY.getBytes(StandardCharsets.UTF_8));
+        MidtransTransactionResponse transaction = midtransApiClient.getTransactionStatusByOrderId(orderId, headerValue);
+        validateSignatureKey(transaction.getOrderId(), transaction.getStatusCode(), transaction.getGrossAmount(), transaction.getSignatureKey());
+        Payment payment = updatePaymentStatus(transaction.getOrderId(), transaction.getTransactionStatus());
+        return MapperUtil.toPaymentResponse(payment);
     }
 
+    private Payment getByOrderIdOrThrowNotFound(String orderId) {
+        return paymentRepository.findByOrder_Id(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PAYMENT_NOT_FOUND));
+    }
+
+    private Order validateOrderForPayment(String orderId) {
+        Order order = orderService.getOne(orderId);
+        if (!order.getOrderStatus().equals(OrderStatus.DRAFT)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_CHECKOUT_ITEM_FROM_NON_DRAFT);
+        }
+        return order;
+    }
+
+    private Payment updatePaymentStatus(String orderId, String transactionStatus) {
+        Payment payment = getByOrderIdOrThrowNotFound(orderId);
+        PaymentStatus newPaymentStatus = PaymentStatus.findByDesc(transactionStatus);
+        payment.setPaymentStatus(newPaymentStatus);
+
+        if (newPaymentStatus != null && newPaymentStatus.equals(PaymentStatus.SETTLEMENT)) {
+            Order order = payment.getOrder();
+            order.setOrderStatus(OrderStatus.CONFIRMED);
+            OrderStatus orderStatus = order.getOrderStatus();
+            orderService.updateStock(order, orderStatus);
+        }
+
+        paymentRepository.saveAndFlush(payment);
+        return payment;
+    }
+
+    private void validateSignatureKey(String orderId, String statusCode, String grossAmount, String midtransSignatureKey) {
+        String rawString = orderId + statusCode + grossAmount + MIDTRANS_SERVER_KEY;
+        log.info("Order ID: {}", orderId);
+        log.info("Status Code: {}", statusCode);
+        log.info("Gross Amount: {}", grossAmount);
+        log.info("Raw String for signature: {}", rawString);
+        String signatureKey = HashUtil.encryptThisString(rawString);
+        if (!signatureKey.equalsIgnoreCase(midtransSignatureKey)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, Constant.ERROR_INVALID_SIGNATURE_KEY_MIDTRANS);
+        }
+    }
 }

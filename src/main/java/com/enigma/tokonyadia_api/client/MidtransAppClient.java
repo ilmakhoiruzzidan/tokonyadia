@@ -1,5 +1,6 @@
 package com.enigma.tokonyadia_api.client;
 
+import com.enigma.tokonyadia_api.config.FeignClientConfiguration;
 import com.enigma.tokonyadia_api.dto.request.MidtransPaymentRequest;
 import com.enigma.tokonyadia_api.dto.response.MidtransSnapResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "midtrans", url = "${midtrans.api.url}")
-public interface MidtransClient {
+@FeignClient(name = "midtransApp", url = "${midtrans.api.url}", configuration = FeignClientConfiguration.class)
+public interface MidtransAppClient {
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE,
