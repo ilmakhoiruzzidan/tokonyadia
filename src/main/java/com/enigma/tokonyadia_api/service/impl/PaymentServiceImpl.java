@@ -45,6 +45,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createPayment(PaymentRequest request) {
         Order order = validateOrderForPayment(request.getOrderId());
+        // update stock
+        orderService.updateStock(order, OrderStatus.PENDING);
         long amount = calculateOrderAmount(order);
         MidtransSnapResponse snapTransaction = initiateMidtransPayment(order, amount);
         Payment payment = Payment.builder()
@@ -57,8 +59,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         paymentRepository.saveAndFlush(payment);
         orderService.updateOrderStatus(order.getId(), OrderStatus.PENDING);
-        // update stock
-        orderService.updateStock(order, OrderStatus.PENDING);
         return MapperUtil.toPaymentResponse(payment);
     }
 

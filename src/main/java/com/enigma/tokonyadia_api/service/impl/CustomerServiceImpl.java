@@ -90,7 +90,6 @@ public class CustomerServiceImpl implements CustomerService {
         if (customer == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_CUSTOMER_NOT_FOUND);
         customerRepository.deleteById(id);
-
     }
 
     @Override
