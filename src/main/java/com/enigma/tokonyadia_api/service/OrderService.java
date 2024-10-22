@@ -31,6 +31,7 @@ public interface OrderService {
 
     void updateOrderStatus(String orderId, OrderStatus orderStatus);
     void updateStock(Order order, OrderStatus orderStatus);
+    void rollbackStock(Order order);
 
     OrderResponse deleteOrderDetails(String orderId, String detailsId);
 }

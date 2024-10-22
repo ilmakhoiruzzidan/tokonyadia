@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateStock(Order order, OrderStatus orderStatus){
-        if (OrderStatus.CONFIRMED.equals(orderStatus)) {
+        if (OrderStatus.PENDING.equals(orderStatus)) {
             for (OrderDetail orderDetail : order.getOrderDetails()) {
                 Product product = orderDetail.getProduct();
                 Integer quantity = orderDetail.getQty();
@@ -161,6 +161,16 @@ public class OrderServiceImpl implements OrderService {
                 product.setStock(product.getStock() - quantity);
                 productService.updateProductAndImage(product);
             }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void rollbackStock(Order order) {
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            Product product = orderDetail.getProduct();
+            product.setStock(product.getStock() + orderDetail.getQty());
+            productService.updateProductAndImage(product);
         }
     }
 

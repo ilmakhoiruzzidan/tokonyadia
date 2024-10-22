@@ -14,7 +14,6 @@ import com.enigma.tokonyadia_api.entity.Payment;
 import com.enigma.tokonyadia_api.repository.PaymentRepository;
 import com.enigma.tokonyadia_api.service.OrderService;
 import com.enigma.tokonyadia_api.service.PaymentService;
-import com.enigma.tokonyadia_api.util.DateUtil;
 import com.enigma.tokonyadia_api.util.HashUtil;
 import com.enigma.tokonyadia_api.util.MapperUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.List;
 
@@ -59,6 +57,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         paymentRepository.saveAndFlush(payment);
         orderService.updateOrderStatus(order.getId(), OrderStatus.PENDING);
+        // update stock
+        orderService.updateStock(order, OrderStatus.PENDING);
         return MapperUtil.toPaymentResponse(payment);
     }
 
@@ -83,12 +83,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .phone(order.getCustomer().getPhoneNumber())
                 .build();
 
-        int duration = 10;
-        MidtransExpiryRequest expireRequest = MidtransExpiryRequest.builder()
-                .startTime(DateUtil.zonedDateTimeToString(ZonedDateTime.now()))
-                .unit("minute")
-                .duration(duration)
-                .build();
 
         MidtransPaymentRequest midtransPaymentRequest = MidtransPaymentRequest.builder()
                 .transactionDetail(MidtransTransactionRequest.builder()
@@ -98,7 +92,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .enabledPayments(List.of("bca_va", "gopay", "shopeepay", "other_qris"))
                 .itemDetails(itemDetails)
                 .customerDetails(customerDetailsRequest)
-                .expiry(expireRequest)
                 .build();
         String headerValue = "Basic " + Base64.getEncoder().encodeToString(MIDTRANS_SERVER_KEY.getBytes(StandardCharsets.UTF_8));
         return midtransAppClient.createSnapTransaction(midtransPaymentRequest, headerValue);
@@ -136,16 +129,26 @@ public class PaymentServiceImpl implements PaymentService {
         return order;
     }
 
-    private Payment updatePaymentStatus(String orderId, String transactionStatus) {
+    @Transactional(rollbackFor = Exception.class)
+    protected Payment updatePaymentStatus(String orderId, String transactionStatus) {
         Payment payment = getByOrderIdOrThrowNotFound(orderId);
         PaymentStatus newPaymentStatus = PaymentStatus.findByDesc(transactionStatus);
         payment.setPaymentStatus(newPaymentStatus);
 
-        if (newPaymentStatus != null && newPaymentStatus.equals(PaymentStatus.SETTLEMENT)) {
-            Order order = payment.getOrder();
-            order.setOrderStatus(OrderStatus.CONFIRMED);
-            OrderStatus orderStatus = order.getOrderStatus();
-            orderService.updateStock(order, orderStatus);
+        if (newPaymentStatus != null) {
+            switch (newPaymentStatus) {
+                case SETTLEMENT:
+                    payment.getOrder().setOrderStatus(OrderStatus.CONFIRMED);
+                    break;
+                case EXPIRE:
+                    payment.getOrder().setOrderStatus(OrderStatus.EXPIRE);
+                    orderService.rollbackStock(payment.getOrder());
+                    break;
+                case DENY, CANCEL:
+                payment.getOrder().setOrderStatus(OrderStatus.FAILED);
+                orderService.rollbackStock(payment.getOrder());
+                    break;
+            }
         }
 
         paymentRepository.saveAndFlush(payment);

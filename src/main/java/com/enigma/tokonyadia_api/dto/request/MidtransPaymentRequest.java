@@ -22,7 +22,5 @@ public class MidtransPaymentRequest {
     @JsonProperty(value = "customer_details")
     private MidtransCustomerDetailsRequest customerDetails;
 
-    @JsonProperty(value = "expiry")
-    private MidtransExpiryRequest expiry;
 }
 

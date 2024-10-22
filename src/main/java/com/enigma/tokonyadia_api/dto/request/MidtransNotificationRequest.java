@@ -23,4 +23,5 @@ public class MidtransNotificationRequest {
     private String transactionStatus;
     @JsonProperty(value = "transaction_time")
     private String transactionTime;
+
 }

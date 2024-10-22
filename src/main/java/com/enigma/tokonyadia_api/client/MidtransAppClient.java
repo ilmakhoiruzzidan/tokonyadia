@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "midtransApp", url = "${midtrans.api.url}", configuration = FeignClientConfiguration.class)
+@FeignClient(name = "midtransApp", url = "${midtrans.app.url}", configuration = FeignClientConfiguration.class)
 public interface MidtransAppClient {
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,

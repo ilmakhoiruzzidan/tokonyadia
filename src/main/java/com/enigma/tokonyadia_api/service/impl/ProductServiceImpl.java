@@ -118,6 +118,7 @@ public class ProductServiceImpl implements ProductService {
                     });
 
             SimpleProductResponse simpleProductResponse = SimpleProductResponse.builder()
+                    .productId(product.getId())
                     .productName(product.getName())
                     .stock(product.getStock())
                     .price(product.getPrice())

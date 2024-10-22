@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class SimpleProductResponse {
+    private String productId;
     private String productName;
     private Integer stock;
     private List<FileResponse> images;
