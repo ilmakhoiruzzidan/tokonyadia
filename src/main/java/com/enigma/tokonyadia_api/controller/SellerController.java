@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping(path = Constant.SELLER_API)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@Tag(name = "Seller Management", description = "Operations related to managing seller data, including creation, update, retrieval, and deletion")
+@Tag(name = "Seller Management", description = "APIs for managing seller data, including creation, update, retrieval, and deletion")
 public class SellerController {
 
     private static class CommonResponseSellerResponse extends CommonResponse<SellerResponse> {
