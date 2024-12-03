@@ -1,6 +1,5 @@
 package com.enigma.tokonyadia_api.security;
 
-import com.enigma.tokonyadia_api.constant.Constant;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

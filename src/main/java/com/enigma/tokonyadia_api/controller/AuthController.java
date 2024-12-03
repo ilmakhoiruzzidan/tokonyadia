@@ -98,11 +98,15 @@ public class AuthController {
     }
 
     private String getRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie cookie = Arrays.stream(request.getCookies())
-                .filter(c -> c.getName().equals(Constant.REFRESH_TOKEN_COOKIE_NAME))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.REFRESH_TOKEN_REQUIRED));
-        return cookie.getValue();
+        try {
+            Cookie cookie = Arrays.stream(request.getCookies())
+                    .filter(c -> c.getName().equals(Constant.REFRESH_TOKEN_COOKIE_NAME))
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.REFRESH_TOKEN_REQUIRED));
+            return cookie.getValue();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void setCookie(HttpServletResponse response, String refreshToken) {

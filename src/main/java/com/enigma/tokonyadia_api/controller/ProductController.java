@@ -111,7 +111,7 @@ public class ProductController {
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable String id,
-                                           @RequestParam List<MultipartFile> images,
+                                           @RequestParam(required = false) List<MultipartFile> images,
                                            @RequestParam String product) {
         try {
             ProductRequest productRequest = objectMapper.readValue(product, ProductRequest.class);
@@ -125,7 +125,7 @@ public class ProductController {
     @GetMapping("/stores")
     public ResponseEntity<?> getProductByStores(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "size", required = false, defaultValue = "15") Integer size,
             @RequestParam(name = "maxPrice", required = false) Long maxPrice,
             @RequestParam(name = "minPrice", required = false) Long minPrice,
             @RequestParam(name = "q", required = false) String query,

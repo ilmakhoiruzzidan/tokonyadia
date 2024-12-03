@@ -46,10 +46,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ProductCategoryResponse update(ProductCategoryRequest request, String id) {
-        Category category = getOne(id);
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
-        return MapperUtil.toCategoryResponse(category);
+        Category newCategory = getOne(id);
+        newCategory.setName(request.getName());
+        newCategory.setDescription(request.getDescription());
+        categoryRepository.save(newCategory);
+        return MapperUtil.toCategoryResponse(newCategory);
     }
 
     @Override

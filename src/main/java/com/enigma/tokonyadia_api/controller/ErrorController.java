@@ -2,6 +2,7 @@ package com.enigma.tokonyadia_api.controller;
 
 
 import com.enigma.tokonyadia_api.util.ResponseUtil;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -54,6 +55,17 @@ public class ErrorController {
     public ResponseEntity<?> handlingConstraintViolationException(ConstraintViolationException e) {
         log.error("Exception ConstraintViolationException : {}", e.getMessage());
         return ResponseUtil.buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseUtil.buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e) {
+        return ResponseUtil.buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+
     }
 
 }

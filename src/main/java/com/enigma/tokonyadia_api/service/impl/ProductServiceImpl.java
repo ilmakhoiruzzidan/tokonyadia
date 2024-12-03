@@ -137,7 +137,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProductAndImage(List<MultipartFile> multipartFiles, ProductRequest request, String id) {
         Product newProduct = getOne(id);
         newProduct.setName(request.getName());
+        newProduct.setStock(request.getStock());
         newProduct.setPrice(request.getPrice());
+        newProduct.setDescription(request.getDescription());
+        newProduct.setStore(storeService.getOne(request.getStoreId()));
+        newProduct.setCategory(productCategoryService.getOne(request.getCategoryId()));
 
         if (multipartFiles != null && !multipartFiles.isEmpty()) {
             List<ProductImage> productImages = productImageService.createBulk(multipartFiles, newProduct);
